@@ -182,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 asistenciaInfoHTML = `
                     <div class="class-attendance-bar">
                         <span class="label"><i class="fa-solid fa-circle-check"></i> Asistencia Registrada</span>
-                        <span class="val">${asistieron} / ${inscritos} Alumnos</span>
+                        <span class="val">${asistieron} Alumnos</span>
                     </div>
                 `;
             } else {
@@ -204,8 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <h3 class="class-name">${clase.nombre || 'Entrenamiento'}</h3>
                 <div class="class-stats">
-                    <div class="stat-item"><i class="fa-solid fa-users-line" style="color:#3b82f6;"></i> Inscritos: <strong>${inscritos} / ${clase.cupos}</strong></div>
-                    <div class="stat-item"><i class="fa-solid fa-fire" style="color:#f97316;"></i> Calorías: <strong>${clase.calorias} kcal</strong></div>
+                    <div class="stat-item"><i class="fa-solid fa-users-line" style="color:#3b82f6;"></i> Inscritos: <strong>${inscritos}</strong></div>
                 </div>
                 ${asistenciaInfoHTML}
             `;
@@ -283,8 +282,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const inscritos = clase.alumnosInscritos || [];
         const asistieron = clase.alumnosAsistieron || [];
         const asistieronEmails = asistieron.map(a => a.correo.trim().toLowerCase());
+        const attendanceCounter = document.getElementById('attendance-counter');
+        const attendanceCount = document.getElementById('attendance-count');
+        const updateAttendanceCounter = () => {
+            const checkedCount = document.querySelectorAll('.student-switch:checked').length;
+            if (attendanceCounter) attendanceCounter.style.display = 'block';
+            if (attendanceCount) attendanceCount.innerText = checkedCount;
+        };
 
         if (inscritos.length === 0) {
+            if (attendanceCounter) attendanceCounter.style.display = 'none';
             studentsAttendanceList.innerHTML = `
                 <div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13.5px;">
                     <i class="fa-solid fa-users-slash" style="font-size:28px; margin-bottom:8px; display:block;"></i>
@@ -330,7 +337,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 </label>
             `;
             studentsAttendanceList.appendChild(item);
+            const switchInput = item.querySelector('.student-switch');
+            if (switchInput) {
+                switchInput.addEventListener('change', updateAttendanceCounter);
+            }
         });
+
+        updateAttendanceCounter();
     };
 
     // Guardar Asistencia en Firebase

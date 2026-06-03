@@ -87,6 +87,9 @@
             <div class="vertical-scroll">
                 <p style="color:var(--text-muted); font-size:13px; margin-bottom:10px; line-height:1.4;">Marca a los alumnos que están entrenando en este momento. Al terminar, presiona "Guardar Asistencia".</p>
                 
+                <div id="attendance-counter" style="display:none; background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0; border-radius:12px; padding:10px 12px; margin-bottom:12px; font-size:13px; font-weight:800;">
+                    <i class="fa-solid fa-user-check" style="margin-right:6px;"></i> Asistentes marcados: <span id="attendance-count">0</span>
+                </div>
                 <div id="students-attendance-list" style="display:flex; flex-direction:column; gap:12px; width:100%; margin-top:10px;">
                     <!-- Lista de alumnos y switches inyectados por JS -->
                 </div>

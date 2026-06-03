@@ -1179,13 +1179,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     <div style="background:#f8fafc; padding:12px; border-radius:12px; margin-bottom:15px; border:1px solid rgba(0,0,0,0.02);">
                         ${attendanceIndicator}
-                        <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px;">
-                            <span style="color:var(--text-muted);"><i class="fa-solid fa-fire" style="color:#f97316; margin-right:4px;"></i> Calorías:</span>
-                            <strong>${clase.calorias} kcal</strong>
-                        </div>
                         <div style="display:flex; justify-content:space-between; font-size:12px;">
-                            <span style="color:var(--text-muted);"><i class="fa-solid fa-users-line" style="color:#3b82f6; margin-right:4px;"></i> Cupos:</span>
-                            <strong>${inscritosCount} / ${clase.cupos}</strong>
+                            <span style="color:var(--text-muted);"><i class="fa-solid fa-users-line" style="color:#3b82f6; margin-right:4px;"></i> Inscritos:</span>
+                            <strong>${inscritosCount} Alumnos</strong>
                         </div>
                     </div>
 
@@ -1364,7 +1360,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div>Fecha: <strong>${fechaFormat}</strong></div>
                             <div>Hora: <strong>${clase.hora}</strong></div>
                             <div>Profesor: <strong>${clase.profesor}</strong></div>
-                            <div>Cupos Llenos: <strong>${clase.alumnosInscritos ? clase.alumnosInscritos.length : 0} / ${clase.cupos}</strong></div>
+                            <div>Alumnos inscritos: <strong>${clase.alumnosInscritos ? clase.alumnosInscritos.length : 0}</strong></div>
                         </div>
                     </div>
                     
@@ -1436,17 +1432,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     </select>
                 </div>
 
-                <div style="display:flex; gap:15px; margin-bottom:15px;">
-                    <div class="input-group" style="flex:1; margin-bottom:0;">
-                        <i class="fa-solid fa-users"></i>
-                        <input type="number" id="cl-cupos" placeholder="Cupos límite" min="1" required>
-                    </div>
-                    <div class="input-group" style="flex:1; margin-bottom:0;">
-                        <i class="fa-solid fa-fire"></i>
-                        <input type="number" id="cl-calorias" placeholder="Calor. a quemar" min="1" required>
-                    </div>
-                </div>
-
                 <div style="background:var(--bg-color); padding:15px; border-radius:12px; border:1px solid rgba(0,0,0,0.05); margin-bottom:15px;">
                     <h5 style="font-size:13px; margin-bottom:10px; color:var(--text-main);">Ejercicios Asignados (Opcional)</h5>
                     <div style="max-height:110px; overflow-y:auto; padding-right:5px;">
@@ -1473,8 +1458,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 fecha: document.getElementById('cl-fecha').value,
                 hora: document.getElementById('cl-hora').value,
                 profesor: document.getElementById('cl-profesor').value,
-                cupos: parseInt(document.getElementById('cl-cupos').value),
-                calorias: parseInt(document.getElementById('cl-calorias').value),
                 ejercicios: ejs,
                 alumnosInscritos: []
             }).then(() => {
@@ -1530,17 +1513,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     </select>
                 </div>
 
-                <div style="display:flex; gap:15px; margin-bottom:15px;">
-                    <div class="input-group" style="flex:1; margin-bottom:0;">
-                        <i class="fa-solid fa-users"></i>
-                        <input type="number" id="cl-cupos" value="${clase.cupos}" min="1" required>
-                    </div>
-                    <div class="input-group" style="flex:1; margin-bottom:0;">
-                        <i class="fa-solid fa-fire"></i>
-                        <input type="number" id="cl-calorias" value="${clase.calorias}" min="1" required>
-                    </div>
-                </div>
-
                 <div style="background:var(--bg-color); padding:15px; border-radius:12px; border:1px solid rgba(0,0,0,0.05); margin-bottom:15px;">
                     <h5 style="font-size:13px; margin-bottom:10px; color:var(--text-main);">Ejercicios Asignados</h5>
                     <div style="max-height:110px; overflow-y:auto; padding-right:5px;">
@@ -1561,10 +1533,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 fecha: document.getElementById('cl-fecha').value,
                 hora: document.getElementById('cl-hora').value,
                 profesor: document.getElementById('cl-profesor').value,
-                cupos: parseInt(document.getElementById('cl-cupos').value),
-                calorias: parseInt(document.getElementById('cl-calorias').value),
                 ejercicios: ejs,
-                alumnosInscritos: clase.alumnosInscritos || []
+                alumnosInscritos: clase.alumnosInscritos || [],
+                alumnosAsistieron: clase.alumnosAsistieron || [],
+                asistenciaGrabada: !!clase.asistenciaGrabada
             }).then(() => {
                 document.getElementById('generic-modal').classList.add('hidden');
             }).catch(err => alert("Error al guardar cambios de clase: " + err));

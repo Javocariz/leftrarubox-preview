@@ -285,7 +285,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let misClasesPasadas = db.clases.filter(c => c.alumnosInscritos && c.alumnosInscritos.includes(currentUserEmail) && new Date(c.fecha + 'T' + c.hora) < hoy);
         
         const totalClases = misClasesPasadas.length;
-        const totalCalorias = misClasesPasadas.reduce((sum, c) => sum + (c.calorias || 0), 0);
 
         const muscleCounts = {
             'Pecho': 0, 'Espalda': 0, 'Piernas': 0, 
@@ -364,9 +363,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p style="font-size:11px; color:var(--text-muted); margin:0; text-transform:uppercase; font-weight:800;">Asistencias</p>
                 </div>
                 <div class="data-card glassmorphism" style="text-align:center; padding:20px 10px; display:flex; flex-direction:column; justify-content:center; margin-bottom:0;">
-                    <div style="font-size:24px; margin-bottom:5px; color:#f97316;"><i class="fa-solid fa-fire"></i></div>
-                    <h3 style="font-size:24px; margin:0 0 5px 0; font-weight:900;">${totalCalorias}</h3>
-                    <p style="font-size:11px; color:var(--text-muted); margin:0; text-transform:uppercase; font-weight:800;">Kcal Quemadas</p>
+                    <div style="font-size:24px; margin-bottom:5px; color:#60a5fa;"><i class="fa-solid fa-ticket"></i></div>
+                    <h3 style="font-size:24px; margin:0 0 5px 0; font-weight:900;">${currentUser.creditos || 0}</h3>
+                    <p style="font-size:11px; color:var(--text-muted); margin:0; text-transform:uppercase; font-weight:800;">Clases Restantes</p>
                 </div>
             </div>
 
@@ -555,10 +554,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (!clase.alumnosInscritos || !Array.isArray(clase.alumnosInscritos)) {
                             clase.alumnosInscritos = [];
                         }
-                        const inscritos = clase.alumnosInscritos.length;
-                        // parseInt defensivo para cupos (Firestore puede devolver integerValue de forma distinta)
-                        const cuposTotal = parseInt(clase.cupos) || 0;
-                        const hayCupo = cuposTotal > 0 && inscritos < cuposTotal;
                         const yaInscrito = clase.alumnosInscritos.includes(currentUserEmail);
 
                         // Validar si la clase ya pasó (hoy pero hora anterior)
@@ -572,10 +567,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             btnHtml = `<button class="btn-primary btn-sm" disabled style="background:#e2e8f0; color:#64748b; width:100%;">Inscrito</button>`;
                         } else if (isPastClass) {
                             btnHtml = `<button class="btn-primary btn-sm" disabled style="background:#e2e8f0; color:#64748b; width:100%;">Clase Finalizada</button>`;
-                        } else if (!hayCupo) {
-                            btnHtml = `<button class="btn-primary btn-sm" disabled style="background:#fef2f2; color:#ef4444; width:100%;">Clase Llena</button>`;
                         } else {
-                            btnHtml = `<button class="btn-primary btn-sm" onclick="bookClass(${originalIdx})" style="width:100%; background:#0f172a;">Reservar Cupo</button>`;
+                            btnHtml = `<button class="btn-primary btn-sm" onclick="bookClass(${originalIdx})" style="width:100%; background:#0f172a;">Reservar Clase</button>`;
                         }
 
                         const ejList = (clase.ejercicios || []).map(e => (e && e.nombre) ? e.nombre : '').filter(Boolean).join(', ') || 'Rutina General';
@@ -586,10 +579,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         cardDiv.innerHTML = `
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                                 <h3 style="margin:0; font-size:24px; color:var(--text-main); font-weight:900;">${clase.hora || '--:--'}</h3>
-                                <div style="text-align:right;">
-                                    <span style="font-size:10px; color:var(--text-muted); text-transform:uppercase;">Cupos</span><br>
-                                    <strong style="color:${hayCupo ? 'var(--success-color)' : 'var(--danger-color)'}; font-size:14px;">${inscritos}/${cuposTotal}</strong>
-                                </div>
                             </div>
                             <h4 style="margin:0 0 5px 0; font-size:14px; color:var(--primary-color); text-transform:capitalize;">${clase.nombre || 'Clase de Entrenamiento'}</h4>
                             <p style="font-size:11px; color:var(--text-muted); margin-bottom:10px; line-height:1.4;"><strong>Ejercicios:</strong> ${ejList}</p>
