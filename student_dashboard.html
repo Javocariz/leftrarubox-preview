@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Portal Alumno - Leftrarubox</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css?v=1.0.1">
+    <link rel="stylesheet" href="css/student.css?v=1.0.1">
+    <style>
+        /* === CORRECCIÓN CRÍTICA DE VISTA DE CLASES DISPONIBLES (INLINE CONTRA CACHÉ LOCAL) === */
+        @media (min-width: 768px) {
+            #modal-reservar .modal-content.glassmorphism {
+                max-width: 900px !important; /* Panel ancho y panorámico para ver toda la semana */
+            }
+        }
+
+        /* Contenedor responsivo de clases disponibles: Vertical en celular (pulgar scroll), horizontal bento en escritorio */
+        #clases-disponibles-list {
+            display: flex !important;
+            flex-direction: column !important; /* Móvil: Apilamiento vertical ultra-cómodo */
+            gap: 20px !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            padding-bottom: 10px !important;
+            width: 100% !important;
+        }
+
+        #clases-disponibles-list > div {
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+            flex-shrink: 0 !important;
+        }
+
+        @media (min-width: 768px) {
+            #clases-disponibles-list {
+                flex-direction: row !important; /* Escritorio: Columnas de días una al lado de otra */
+                flex-wrap: wrap !important; /* Envolver en filas si hay muchos días, eliminando scroll horizontal */
+                justify-content: flex-start !important;
+                overflow-x: visible !important;
+                overflow-y: visible !important;
+            }
+            
+            #clases-disponibles-list > div {
+                flex: 1 1 270px !important; /* Columnas flexibles con ancho base de 270px */
+                max-width: 320px !important;
+                min-width: 260px !important;
+                scroll-snap-align: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="student-body">
+
+    <!-- Fondo de Imagen Hero -->
+    <div class="hero-bg"></div>
+
+    <main class="student-dashboard">
+        
+        <!-- ENCABEZADO -->
+        <header class="student-header">
+            <div class="profile-info">
+                <div class="avatar" id="student-avatar">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <div class="greeting-box">
+                    <span class="greeting">Bienvenido,</span>
+                    <h1 class="student-name" id="student-name">Cargando...</h1>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="glass-icon-btn" id="btn-bell-notifications"><i class="fa-regular fa-bell"></i></button>
+                <button class="glass-icon-btn" id="btn-logout" title="Cerrar Sesión"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+            </div>
+        </header>
+
+        <!-- TARJETA GLOBAL (Estado del Plan) -->
+        <section class="global-index-card glassmorphism">
+            <div class="card-top-row">
+                <h3>Resumen de Suscripción</h3>
+                <button class="black-arrow-btn" id="btn-open-reservar" title="Reservar Clase">
+                    <i class="fa-solid fa-calendar-plus"></i>
+                </button>
+            </div>
+            
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; background:rgba(255,255,255,0.5); padding:15px; border-radius:15px;">
+                <div>
+                    <p style="font-size:11px; color:var(--text-muted); margin:0; text-transform:uppercase; font-weight:800;">Clases Restantes</p>
+                    <h2 id="big-credits-number" style="font-size:42px; font-weight:900; margin:0; color:var(--text-main); line-height:1;">0</h2>
+                </div>
+                <div style="text-align:right;">
+                    <p id="vencimiento-text" style="font-size:12px; color:var(--text-main); font-weight:600; margin:0 0 5px 0;">Válido hasta --/--</p>
+                    <span class="badge" style="background:rgba(163,230,53,0.15); color:#65a30d; margin:0;">Activo</span>
+                </div>
+            </div>
+
+            <div class="bars-container">
+                <div class="bar-row">
+                    <span>Créditos</span>
+                    <div class="progress-track"><div class="progress-fill" id="credits-fill" style="width: 0%; background: #a3e635;"></div></div>
+                </div>
+                <div class="bar-row">
+                    <span>Tiempo</span>
+                    <div class="progress-track"><div class="progress-fill" id="time-fill" style="width: 0%; background: #60a5fa;"></div></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- KPIs Y RADAR DEL ATLETA -->
+        <section id="main-stats-section" style="margin-bottom:25px;">
+            <!-- Inyectado por JS -->
+        </section>
+
+        <!-- PANEL INFERIOR (Mis Próximas Clases) -->
+        <section class="bottom-glass-panel glassmorphism">
+            <div class="panel-header">
+                <h3><i class="fa-solid fa-bolt" style="margin-right:5px;"></i> Mis Próximas Clases</h3>
+                <button class="text-btn" id="btn-historial">Ver historial</button>
+            </div>
+            
+            <div class="horizontal-scroll" id="next-classes-container">
+                <!-- Tarjetas inyectadas por JS -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MENÚ INFERIOR (Bottom Nav Pill) -->
+    <nav class="pill-nav glassmorphism">
+        <button class="nav-btn active" id="btn-nav-home"><i class="fa-solid fa-house"></i></button>
+        <button class="nav-btn" id="btn-nav-historial"><i class="fa-regular fa-calendar"></i></button>
+        <button class="nav-btn main-action" id="btn-nav-reservar"><i class="fa-solid fa-calendar-plus"></i></button>
+        <button class="nav-btn" id="btn-nav-notifications"><i class="fa-regular fa-bell"></i></button>
+        <button class="nav-btn" id="btn-nav-profile"><i class="fa-regular fa-user"></i></button>
+    </nav>
+
+    <!-- MODAL RESERVAR (Pantalla Completa Flotante) -->
+    <div id="modal-reservar" class="full-screen-modal hidden">
+        <div class="modal-content glassmorphism">
+            <div class="modal-header">
+                <h2>Clases Disponibles</h2>
+                <button class="black-arrow-btn" id="btn-close-reservar"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p style="color:var(--text-muted); font-size:13px; margin-bottom:20px;">Busca y reserva tu lugar para los próximos días.</p>
+            
+            <div id="clases-disponibles-list" class="vertical-scroll">
+                <!-- Clases inyectadas por JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL HISTORIAL -->
+    <div id="modal-historial" class="full-screen-modal hidden">
+        <div class="modal-content glassmorphism">
+            <div class="modal-header">
+                <h2>Mi Historial</h2>
+                <button class="black-arrow-btn" id="btn-close-historial"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p style="color:var(--text-muted); font-size:13px; margin-bottom:20px;">Clases pasadas y cancelaciones.</p>
+            
+            <div id="historial-list" class="vertical-scroll">
+                <!-- Historial inyectado por JS -->
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- MODAL PERFIL -->
+    <div id="modal-profile" class="full-screen-modal hidden">
+        <div class="modal-content glassmorphism">
+            <div class="modal-header">
+                <h2>Mi Perfil</h2>
+                <button class="black-arrow-btn" id="btn-close-profile"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="profile-content" class="vertical-scroll" style="display:flex; flex-direction:column; align-items:center; padding-top:20px;">
+                <!-- Inyectado por JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL COMPROBANTE DE PAGO (Voucher) -->
+    <div id="modal-voucher" class="full-screen-modal hidden">
+        <div class="modal-content glassmorphism">
+            <div class="modal-header">
+                <h2>Comprobante de Pago</h2>
+                <button class="black-arrow-btn" id="btn-close-voucher"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p style="color:var(--text-muted); font-size:13px; margin-bottom:20px; text-align:center;">Envía el voucher de tu transferencia para renovar tu suscripción.</p>
+            <div id="voucher-status-content" class="vertical-scroll" style="display:flex; flex-direction:column; align-items:center; width:100%;">
+                <!-- Cargado dinámicamente desde student.js -->
+            </div>
+        </div>
+    </div>
+    <!-- PANTALLA DE BLOQUEO POR VENCIMIENTO -->
+    <div id="block-screen-expired" class="full-screen-modal hidden" style="backdrop-filter: blur(15px); background: rgba(15, 23, 42, 0.95); z-index: 9999; display: flex; align-items: center; justify-content: center; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;">
+        <div class="modal-content glassmorphism" style="max-width: 400px; text-align: center; border: 1px solid rgba(239, 68, 68, 0.3); box-shadow: 0 10px 30px rgba(239, 68, 68, 0.15); box-sizing: border-box; padding: 25px; height: auto; max-height: 90vh; overflow-y: auto;">
+            <div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(239, 68, 68, 0.15); color: #ef4444; display: flex; justify-content: center; align-items: center; font-size: 30px; margin: 0 auto 20px;">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <h2 style="font-size: 20px; font-weight: 900; color: #1e293b; margin: 0 0 10px 0;">Acceso Suspendido</h2>
+            <p style="font-size: 13px; color: #475569; line-height: 1.5; margin: 0 0 25px 0;">Tu suscripción venció el <strong id="block-expire-date" style="color: #ef4444;">--/--/----</strong>. Realiza la transferencia de tu mensualidad y sube el comprobante para reactivar tu cuenta.</p>
+            
+            <div id="block-voucher-status-container" style="width: 100%; box-sizing: border-box;">
+                <!-- Formulario o estado inyectado por JS -->
+            </div>
+            
+            <button id="btn-logout-blocked" class="btn-primary" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); width: 100%; margin-top: 15px; padding: 12px; border-radius: 12px; font-weight: 800; font-size: 13px; cursor: pointer; transition: all 0.2s ease;"><i class="fa-solid fa-arrow-right-from-bracket" style="margin-right: 6px;"></i> Cerrar Sesión</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Firebase SDKs Compat -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js?v=1.0.1"></script>
+    <script src="js/student.js?v=1.0.5"></script>
+</body>
+</html>

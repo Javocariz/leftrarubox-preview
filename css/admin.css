@@ -1,0 +1,396 @@
+/* =========================================================================
+   ESTILOS PANEL ADMINISTRADOR (FULL SCREEN GRID MÓVIL/DESKTOP)
+   ========================================================================= */
+
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+    background-color: var(--bg-color);
+}
+
+/* --- HEADER GLOBAL --- */
+.global-header {
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+    z-index: 10;
+}
+
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-circle-small {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: var(--primary-gradient);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    box-shadow: var(--shadow-glow);
+}
+
+.logo-area h2 {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text-main);
+}
+.logo-area h2 span {
+    color: var(--success-color);
+}
+
+.user-profile-mini {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+/* --- MAIN CONTENT --- */
+.main-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 30px 5vw; /* Margen responsivo automático */
+}
+
+/* --- MÓDULOS Y TRANSICIONES --- */
+.module {
+    display: none;
+    animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.module.active {
+    display: block;
+}
+
+.section-title {
+    font-size: 26px;
+    font-weight: 800;
+    margin-bottom: 40px;
+    color: var(--text-main);
+    text-align: center;
+}
+
+/* --- MENÚ GRID PRINCIPAL (VISTA DE TARJETAS) --- */
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 30px;
+    width: 100%;
+    max-width: 950px; /* Ancho máximo para mantener las tarjetas compactas */
+    margin: 0 auto;   /* Centra el bloque entero en pantallas grandes */
+}
+
+.menu-card {
+    background: white;
+    border-radius: 24px;
+    padding: 35px 20px;
+    text-align: center;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid rgba(255,255,255,0.8);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.menu-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+}
+
+.menu-icon-wrapper {
+    width: 65px;
+    height: 65px;
+    border-radius: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 20px;
+    color: white;
+    font-size: 26px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.menu-card h3 {
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 5px;
+    color: var(--text-main);
+}
+
+.menu-card p {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+/* --- CABECERA DE MÓDULOS INTERNOS --- */
+.module-header {
+    margin-bottom: 30px;
+}
+
+.btn-back-menu {
+    background: white;
+    border: 1px solid rgba(0,0,0,0.05);
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 25px;
+    padding: 8px 16px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    transition: all 0.2s;
+}
+
+.btn-back-menu i {
+    color: var(--text-muted);
+}
+
+.btn-back-menu:hover {
+    background: var(--bg-color);
+    transform: translateX(-3px);
+}
+
+.header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.module-title {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--text-main);
+}
+
+/* --- TARJETAS DE DATOS (NO AJUSTABLES) --- */
+.cards-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: flex-start; /* Evita crecimiento vertical */
+}
+
+.data-card {
+    background: white;
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: var(--shadow-soft);
+    width: max-content; 
+    min-width: 250px;
+    max-width: 350px;
+    position: relative;
+    border: 1px solid rgba(255,255,255,0.8);
+}
+
+.data-card h4 {
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    color: var(--text-main);
+}
+
+.data-card p {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    background: rgba(74, 222, 128, 0.15);
+    color: var(--success-color);
+    margin-bottom: 15px;
+}
+
+/* Botones Sutiles (Acciones) */
+.card-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    border-top: 1px solid rgba(0,0,0,0.04);
+    padding-top: 15px;
+    margin-top: auto;
+}
+
+.btn-icon {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 15px; 
+    padding: 8px;
+    border-radius: 10px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-icon:hover {
+    background: var(--bg-color);
+    color: var(--text-main);
+}
+.btn-icon.delete:hover {
+    color: var(--danger-color);
+    background: rgba(251, 113, 133, 0.1);
+}
+
+.btn-sm {
+    width: auto;
+    padding: 12px 24px;
+    font-size: 14px;
+    border-radius: 12px;
+}
+
+/* --- MODAL --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(45, 55, 72, 0.3);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999 !important;
+    pointer-events: auto !important;
+}
+
+.modal-card {
+    background: white;
+    border-radius: var(--border-radius);
+    width: 90%;
+    max-width: 420px;
+    padding: 30px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+    animation: fadeIn 0.3s;
+    position: relative !important;
+    z-index: 100000 !important;
+    pointer-events: auto !important;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    position: relative;
+    z-index: 100010 !important;
+}
+
+.modal-header h3 {
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.modal-body {
+    position: relative;
+    z-index: 100010 !important;
+}
+
+.modal-body .input-group {
+    position: relative !important;
+}
+
+/* Forzar que los iconos de los inputs estén visibles por encima del fondo pero sin interceptar clics */
+.modal-body .input-group i {
+    position: absolute !important;
+    left: 20px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 10 !important;
+    pointer-events: none !important;
+    color: var(--text-muted) !important;
+}
+
+.modal-body .input-group input, 
+.modal-body .input-group select, 
+.modal-body .input-group textarea {
+    width: 100%;
+    padding: 16px 16px 16px 45px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    background: var(--bg-color);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--text-main);
+    resize: none;
+    position: relative !important;
+    z-index: 5 !important;
+    pointer-events: auto !important;
+}
+
+.modal-body .input-group select {
+    appearance: none;
+}
+.modal-body .input-group textarea {
+    padding-top: 16px;
+    min-height: 100px;
+}
+.modal-body .input-group input:focus,
+.modal-body .input-group select:focus,
+.modal-body .input-group textarea:focus {
+    outline: none;
+    border-color: var(--success-color);
+    box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.2);
+    background: white;
+}
+
+/* --- RESPONSIVE MOBILE FIRST --- */
+@media (max-width: 768px) {
+    .menu-grid {
+        grid-template-columns: repeat(2, 1fr); /* Fuerza estrictamente doble fila (2 columnas) en teléfono */
+        gap: 15px;
+    }
+    .menu-card {
+        padding: 25px 15px;
+    }
+    .menu-icon-wrapper {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+    .menu-card h3 {
+        font-size: 15px;
+    }
+    .data-card {
+        width: 100%;
+        max-width: 100%;
+    }
+    .global-header {
+        padding: 12px 15px;
+    }
+    .module-title {
+        font-size: 24px;
+    }
+}

@@ -1,0 +1,739 @@
+/* =========================================================================
+   LEFTRARUBOX - DESIGN SYSTEM (Tema Claro)
+   ========================================================================= */
+
+:root {
+    /* Paleta de Colores - Tonos claros, llamativos y pastel */
+    --bg-color: #f0f4f8; /* Fondo general suave */
+    --card-bg: rgba(255, 255, 255, 0.85); /* Efecto cristal para tarjetas */
+    --text-main: #2d3748; /* Texto principal oscuro pero no negro */
+    --text-muted: #718096; /* Texto secundario */
+    
+    /* Degradados y colores de acento (Efecto WOW) */
+    --primary-gradient: linear-gradient(135deg, #4ade80 0%, #3b82f6 100%); /* Verde a Azul */
+    --secondary-gradient: linear-gradient(135deg, #fb923c 0%, #f43f5e 100%); /* Naranja a Rosa */
+    
+    /* Colores de estado */
+    --success-color: #4ade80;
+    --danger-color: #fb7185;
+    
+    /* UI Tokens */
+    --border-radius: 24px;
+    --border-radius-sm: 16px;
+    --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.05);
+    --shadow-glow: 0 8px 20px rgba(74, 222, 128, 0.3);
+}
+
+/* =========================================================================
+   GLOBAL STYLES
+   ========================================================================= */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    /* Fondo con luces sutiles radiales */
+    background-image: radial-gradient(circle at top right, #e0f2fe, transparent 40%),
+                      radial-gradient(circle at bottom left, #dcfce7, transparent 40%);
+    background-attachment: fixed;
+}
+
+/* =========================================================================
+   LOGIN COMPONENT
+   ========================================================================= */
+.login-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+    animation: fadeIn 0.8s ease-out;
+}
+
+.login-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(12px); /* Glassmorphism */
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: var(--border-radius);
+    padding: 40px 30px;
+    box-shadow: var(--shadow-soft);
+    text-align: center;
+}
+
+.login-header {
+    margin-bottom: 30px;
+}
+
+.logo-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--primary-gradient);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 15px;
+    color: white;
+    font-size: 32px;
+    box-shadow: var(--shadow-glow);
+}
+
+.login-header h1 {
+    font-size: 26px;
+    font-weight: 800;
+    margin-bottom: 5px;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+}
+
+.login-header p {
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+/* Form Inputs */
+.input-group {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.input-group i {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 14px;
+    transition: color 0.3s ease;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 16px 16px 16px 45px;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    background: rgba(255, 255, 255, 0.9);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: var(--text-main);
+    transition: all 0.3s ease;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: var(--success-color);
+    box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.2);
+    background: #ffffff;
+}
+
+.input-group input:focus + i, 
+.input-group input:valid + i {
+    color: var(--success-color);
+}
+
+/* Botones */
+.btn-primary {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    background: var(--primary-gradient);
+    color: white;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: var(--shadow-glow);
+    margin-top: 10px;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(74, 222, 128, 0.4);
+}
+
+.btn-primary:active {
+    transform: translateY(1px);
+}
+
+/* Utilidades */
+.error-message {
+    margin-top: 20px;
+    color: var(--danger-color);
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: rgba(251, 113, 133, 0.1);
+    padding: 10px;
+    border-radius: 12px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Floating WhatsApp Button */
+.btn-whatsapp-floating {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background-color: #25d366;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.btn-whatsapp-floating:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(37, 211, 102, 0.5);
+    background-color: #20bd5a;
+    color: white;
+}
+
+.btn-whatsapp-floating i {
+    font-size: 20px;
+}
+
+/* --- Landing Sections (Servicios/Planes) --- */
+.landing-section {
+    padding: 100px 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+.section-header h2 {
+    font-size: 36px;
+    font-weight: 900;
+    color: #1e293b;
+    margin-bottom: 10px;
+}
+.section-header p {
+    color: var(--text-muted);
+    font-size: 16px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.planes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.plan-card {
+    background: white;
+    border-radius: 24px;
+    padding: 40px 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    border: 1px solid rgba(0,0,0,0.02);
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: flex;
+    flex-direction: column;
+}
+.plan-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.plan-price {
+    font-size: 38px;
+    font-weight: 900;
+    color: #4ade80; /* Verde principal */
+    margin-bottom: 15px;
+    letter-spacing: -1px;
+}
+.plan-name {
+    font-size: 24px;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 15px;
+}
+.plan-desc {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 30px;
+    line-height: 1.6;
+    flex-grow: 1;
+}
+.btn-plan {
+    background: #eef2f6;
+    color: #1e293b;
+    border: none;
+    padding: 15px 24px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+    width: 100%;
+}
+.btn-plan:hover {
+    background: #90ee90;
+    color: #1e293b;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(144, 238, 144, 0.3);
+}
+
+/* =========================================================================
+   LANDING PAGE STYLES (Efecto WOW)
+   ========================================================================= */
+
+body {
+    display: block; /* Override flex */
+    background: #eef2f6; /* Fondo gris muy suave fuera del bento */
+}
+
+.landing-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    height: 90px;
+    background: transparent;
+}
+
+.logo-box {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.navbar-logo {
+    height: 44px;
+    width: auto;
+    object-fit: contain;
+    border-radius: 8px; /* Redondeado sutil para integrarse con el estilo bento */
+    transition: transform 0.3s ease;
+}
+.navbar-logo:hover {
+    transform: scale(1.05);
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+}
+
+.nav-links li a {
+    text-decoration: none;
+    color: #1e293b;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    transition: color 0.3s;
+}
+.nav-links li a.active, .nav-links li a:hover {
+    color: #4ade80;
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.btn-icon-whatsapp {
+    background: #25d366; /* Verde oficial de WhatsApp */
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: white !important; /* Icono blanco */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2);
+}
+
+.btn-icon-whatsapp:hover {
+    transform: translateY(-2px);
+    background: #128c7e; /* Verde WhatsApp oscuro al pasar el cursor */
+    box-shadow: 0 6px 16px rgba(37, 211, 102, 0.4);
+    color: white !important;
+}
+
+.btn-login-trigger {
+    background: #90ee90;
+    border: 1px solid rgba(0,0,0,0.05);
+    padding: 10px 20px;
+    border-radius: 12px;
+    color: #1e293b;
+    font-weight: 800;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+}
+.btn-login-trigger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(144,238,144,0.3);
+}
+
+/* Hero Section Bento */
+.hero-wrapper {
+    position: relative;
+    margin: 0 20px 20px 20px;
+    height: calc(100vh - 110px);
+    border-radius: 40px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+}
+
+.hero-bg {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+}
+.hero-slide {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out, transform 6s linear;
+    transform: scale(1.05);
+}
+.hero-slide.active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.1) 100%);
+}
+
+.hero-content {
+    position: relative;
+    z-index: 10;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 50px;
+    color: white;
+}
+
+.hero-left-text {
+    flex: 1;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    line-height: 1.6;
+}
+
+.hero-center-text {
+    flex: 2;
+    max-width: 500px;
+    margin-bottom: 20px;
+}
+.hero-center-text p {
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 30px;
+    color: rgba(255,255,255,0.9);
+}
+
+.btn-learn-more {
+    background: white;
+    border: none;
+    border-radius: 30px;
+    padding: 5px 20px 5px 5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 12px;
+    transition: transform 0.3s;
+}
+.btn-learn-more:hover { transform: scale(1.05); }
+.btn-icon {
+    width: 35px;
+    height: 35px;
+    background: #90ee90;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #1e293b;
+}
+
+.hero-right-text {
+    flex: 2;
+    text-align: right;
+}
+.hero-right-text h1 {
+    font-size: 8vw;
+    font-weight: 900;
+    line-height: 0.85;
+    letter-spacing: -2px;
+    margin: 0;
+}
+
+/* Adjust Login Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-y: auto; /* Habilita scroll vertical si el contenido desborda */
+    padding: 30px 20px; /* Margen de seguridad responsivo */
+    z-index: 9999;
+}
+
+/* Si la pantalla es corta, alinear al inicio para permitir scroll suave desde el encabezado */
+@media (max-height: 750px) {
+    .modal-overlay {
+        align-items: flex-start;
+    }
+}
+.btn-close-modal {
+    position: absolute;
+    top: 15px; right: 15px;
+    background: rgba(0,0,0,0.05);
+    border: none;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.3s;
+    color: var(--text-main);
+}
+.btn-close-modal:hover { background: rgba(0,0,0,0.1); }
+
+/* =========================================================================
+   FOOTER PREMIUM MINIMALISTA - NC DIGITAL SOLUTIONS CREDIT
+   ========================================================================= */
+.landing-footer {
+    background: #ffffff;
+    padding: 30px 40px;
+    margin: 40px 20px 20px 20px; /* Alineación perfecta con la rejilla bento del Hero */
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.02);
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.footer-copy {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.footer-credits {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.agency-logo {
+    height: 72px;
+    width: 72px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 8px rgba(59, 130, 246, 0.2)); /* Sombra azul metálico sutil */
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.agency-logo:hover {
+    transform: rotate(360deg) scale(1.1); /* Efecto interactivo premium y lúdico */
+}
+
+.footer-credits span {
+    font-size: 9px;
+    color: var(--text-muted);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.footer-credits strong {
+    color: #3b82f6; /* Azul corporativo de tu agencia */
+}
+
+/* Adaptación para pantallas móviles */
+@media (max-width: 768px) {
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 25px;
+    }
+}
+
+/* =========================================================================
+   FAQ MODAL COMPONENT (Bento Glassmorphism Accordion)
+   ========================================================================= */
+.faq-container {
+    width: 100%;
+    max-width: 550px;
+    padding: 20px;
+    animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.faq-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: var(--border-radius);
+    padding: 40px 30px;
+    box-shadow: var(--shadow-soft);
+}
+
+.faq-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.faq-icon-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--primary-gradient);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 15px;
+    color: white;
+    font-size: 26px;
+    box-shadow: var(--shadow-glow);
+}
+
+.faq-header h1 {
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 5px;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+}
+
+.faq-header p {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+/* Accordion Styles */
+.faq-accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-align: left;
+}
+
+.faq-item {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    border-radius: var(--border-radius-sm);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.faq-item.active {
+    background: #ffffff;
+    border-color: rgba(74, 222, 128, 0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+}
+
+.faq-question {
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.faq-question h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0;
+    padding-right: 15px;
+}
+
+.faq-question i {
+    font-size: 12px;
+    color: var(--text-muted);
+    transition: transform 0.3s ease;
+}
+
+.faq-item.active .faq-question i {
+    transform: rotate(180deg);
+    color: var(--success-color);
+}
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s cubic-bezier(0, 1, 0, 1);
+    padding: 0 20px;
+}
+
+.faq-item.active .faq-answer {
+    max-height: 200px;
+    transition: max-height 0.3s cubic-bezier(1, 0, 1, 0);
+    padding: 0 20px 20px 20px;
+}
+
+.faq-answer p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-muted);
+    margin: 0;
+}
+

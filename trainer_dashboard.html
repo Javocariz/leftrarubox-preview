@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Portal Profesor - Leftrarubox</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css?v=1.0.1">
+    <link rel="stylesheet" href="css/trainer.css?v=1.0.1">
+</head>
+<body class="trainer-body">
+
+    <!-- Fondo de Imagen Hero -->
+    <div class="hero-bg"></div>
+
+    <main class="trainer-dashboard">
+        
+        <!-- ENCABEZADO -->
+        <header class="trainer-header">
+            <div class="profile-info">
+                <div class="avatar" id="trainer-avatar">
+                    <i class="fa-solid fa-user-tie"></i>
+                </div>
+                <div class="greeting-box">
+                    <span class="greeting">Entrenador Oficial,</span>
+                    <h1 class="trainer-name" id="trainer-name">Cargando...</h1>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="glass-icon-btn" id="btn-logout" title="Cerrar Sesión">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- INDICADORES RÁPIDOS (BENTO KPIs) -->
+        <section class="kpis-section">
+            <div class="kpi-card glassmorphism">
+                <div class="kpi-icon" style="color: #678070; background: rgba(103, 128, 112, 0.1);"><i class="fa-solid fa-calendar-day"></i></div>
+                <div>
+                    <h3 id="kpi-clases-hoy">0</h3>
+                    <p>Clases Hoy</p>
+                </div>
+            </div>
+            <div class="kpi-card glassmorphism">
+                <div class="kpi-icon" style="color: #3b82f6; background: rgba(59, 130, 246, 0.1);"><i class="fa-solid fa-users"></i></div>
+                <div>
+                    <h3 id="kpi-alumnos-hoy">0</h3>
+                    <p>Alumnos Hoy</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FILTROS DE PESTAÑAS (TODAY VS HISTORY) -->
+        <section class="tabs-section glassmorphism">
+            <button class="tab-btn active" id="tab-hoy">
+                <i class="fa-solid fa-calendar-check"></i> Mi Agenda
+            </button>
+            <button class="tab-btn" id="tab-historial">
+                <i class="fa-solid fa-clock-rotate-left"></i> Historial
+            </button>
+        </section>
+
+        <!-- FEED DE CLASES -->
+        <section class="classes-feed-section">
+            <h2 class="feed-title" id="feed-title">Mi Agenda de Clases</h2>
+            <div class="classes-list" id="trainer-clases-list">
+                <!-- Inyectado dinámicamente -->
+                <p style="text-align:center; color:var(--text-muted); font-size:14px; padding:40px;">Cargando planificación...</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL DE ASISTENCIA (Pantalla Completa Flotante / Sliders) -->
+    <div id="modal-attendance" class="full-screen-modal hidden">
+        <div class="modal-content glassmorphism">
+            <div class="modal-header">
+                <div>
+                    <h2 id="modal-class-title">Pasar Asistencia</h2>
+                    <p id="modal-class-time" style="color:var(--text-muted); font-size:12px; margin-top:2px; font-weight:600;"></p>
+                </div>
+                <button class="btn-close-modal" id="btn-close-attendance" title="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="vertical-scroll">
+                <p style="color:var(--text-muted); font-size:13px; margin-bottom:10px; line-height:1.4;">Marca a los alumnos que están entrenando en este momento. Al terminar, presiona "Guardar Asistencia".</p>
+                
+                <div id="students-attendance-list" style="display:flex; flex-direction:column; gap:12px; width:100%; margin-top:10px;">
+                    <!-- Lista de alumnos y switches inyectados por JS -->
+                </div>
+                
+                <button id="btn-save-attendance" class="btn-primary" style="width:100%; margin-top:20px; border:none; padding:15px; border-radius:15px; font-weight:800; font-size:15px; background:var(--primary-gradient); cursor:pointer; display:flex; justify-content:center; align-items:center; gap:8px; color:white; transition:all 0.3s ease; box-shadow: 0 10px 25px rgba(103, 128, 112, 0.3);">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Guardar Asistencia
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs Compat -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js?v=1.0.1"></script>
+    <script src="js/trainer.js?v=1.0.2"></script>
+</body>
+</html>

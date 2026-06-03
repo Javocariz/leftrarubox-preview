@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leftrarubox - Tu Evolución Física</title>
+    <!-- Fuentes Modernas -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <!-- Iconos FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Estilos de la app -->
+    <link rel="stylesheet" href="css/style.css?v=1.0.1">
+</head>
+<body>
+
+    <!-- Landing Page Navbar -->
+    <nav class="landing-nav">
+        <div class="logo-box">
+            <img src="img/logo.png" alt="LefTraru Élite Fitness Logo" class="navbar-logo">
+        </div>
+        <ul class="nav-links">
+            <li><a href="#" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;" class="active">INICIO</a></li>
+            <li><a href="#" onclick="document.getElementById('servicios').scrollIntoView({behavior: 'smooth'}); return false;">PLANES</a></li>
+            <li><a href="#" onclick="document.getElementById('faq-modal').classList.remove('hidden'); return false;">PREGUNTAS FRECUENTES</a></li>
+            <li><a href="#" onclick="document.querySelector('.landing-footer').scrollIntoView({behavior: 'smooth'}); return false;">CONTACTO</a></li>
+        </ul>
+        <div class="nav-actions">
+            <a href="#" target="_blank" id="btn-whatsapp-nav" class="btn-icon-whatsapp">
+                <i class="fa-brands fa-whatsapp"></i>
+            </a>
+            <button class="btn-login-trigger" onclick="document.getElementById('login-modal').classList.remove('hidden')">
+                <i class="fa-solid fa-qrcode"></i> Login Plataforma
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero-wrapper">
+        <div class="hero-bg">
+            <img src="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=1920&auto=format&fit=crop" class="hero-slide active" alt="Gym">
+            <img src="https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=1920&auto=format&fit=crop" class="hero-slide" alt="Gym 2">
+            <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1920&auto=format&fit=crop" class="hero-slide" alt="Gym 3">
+            <div class="hero-overlay"></div>
+        </div>
+
+        <div class="hero-content">
+            <div class="hero-left-text">
+                <p>TRAIN<br>SMART LIVE<br>STRONG</p>
+            </div>
+            <div class="hero-center-text">
+                <p>Ya seas un principiante o un atleta experimentado, nuestros entrenamientos personalizados, guía experta y comunidad de apoyo están aquí para ayudarte en cada paso del camino. Transforma tu cuerpo y mente con rutinas que se adaptan a tu estilo de vida. ¡Únete hoy y comienza tu viaje hacia una versión más saludable y feliz de ti!</p>
+                <button class="btn-learn-more" onclick="document.getElementById('servicios').scrollIntoView({behavior: 'smooth'})">
+                    <div class="btn-icon"><i class="fa-solid fa-arrow-down"></i></div>
+                    <span>VER PLANES</span>
+                </button>
+            </div>
+            <div class="hero-right-text">
+                <h1>LEFTRARU</h1>
+                <h1>BOX<sup>®</sup></h1>
+            </div>
+        </div>
+    </div>
+
+    <!-- Servicios / Planes Section -->
+    <section id="servicios" class="landing-section hidden">
+        <div class="section-header">
+            <h2>NUESTROS PLANES</h2>
+            <p>Elige la suscripción que mejor se adapte a tus objetivos físicos y únete a la comunidad.</p>
+        </div>
+        <div class="planes-grid" id="landing-planes-grid">
+            <!-- Cards generadas dinámicamente -->
+        </div>
+    </section>
+
+    <!-- Modal Login (El Login Original, ahora como Popup Glassmorphism) -->
+    <div id="login-modal" class="modal-overlay hidden">
+        <div class="login-container">
+            <div class="login-card" style="position:relative;">
+                <button class="btn-close-modal" onclick="document.getElementById('login-modal').classList.add('hidden')"><i class="fa-solid fa-xmark"></i></button>
+                <div class="login-header">
+                    <div class="logo-circle">
+                        <i class="fa-solid fa-dumbbell"></i>
+                    </div>
+                    <h1>Leftrarubox</h1>
+                    <p>Acceso a Plataformas</p>
+                </div>
+                
+                <form id="login-form">
+                    <div class="input-group">
+                        <i class="fa-regular fa-envelope"></i>
+                        <input type="text" id="username" placeholder="Correo o Usuario" required autocomplete="off">
+                    </div>
+                    
+                    <div class="input-group">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="password" placeholder="Contraseña" required>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary">Ingresar al Portal</button>
+                </form>
+                
+                <div id="login-error" class="error-message hidden">
+                    <i class="fa-solid fa-circle-exclamation"></i> Credenciales incorrectas
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pie de Página Premium Bento -->
+    <footer class="landing-footer">
+        <div class="footer-content">
+            <p class="footer-copy">&copy; 2026 LefTraru Élite Fitness. Todos los derechos reservados.</p>
+            <div class="footer-credits">
+                <img src="img/nc-logo.png" alt="NC Digital Solutions Logo" class="agency-logo">
+                <span>Creado por <strong>NC DIGITAL SOLUTIONS</strong></span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Botón Flotante WhatsApp -->
+    <a href="#" target="_blank" id="btn-whatsapp-floating" class="btn-whatsapp-floating hidden">
+        <i class="fa-brands fa-whatsapp"></i> ¿Necesitas Ayuda?
+    </a>
+
+    <!-- Modal Preguntas Frecuentes (FAQ) - Bento Glassmorphism -->
+    <div id="faq-modal" class="modal-overlay hidden">
+        <div class="faq-container">
+            <div class="faq-card" style="position:relative;">
+                <button class="btn-close-modal" onclick="document.getElementById('faq-modal').classList.add('hidden')">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+                <div class="faq-header">
+                    <div class="faq-icon-circle">
+                        <i class="fa-regular fa-circle-question"></i>
+                    </div>
+                    <h1>Preguntas Frecuentes</h1>
+                    <p>Todo lo que necesitas saber para entrenar con nosotros</p>
+                </div>
+                
+                <div class="faq-accordion">
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>¿Cómo reservo mis clases?</h3>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Una vez activo tu plan en la plataforma, inicia sesión con tus credenciales de alumno y podrás agendar tus clases en tiempo real, ver los cupos disponibles y gestionar tu horario semanal de forma totalmente automática.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>¿Necesito experiencia previa para entrenar?</h3>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>¡Para nada! Nuestros entrenamientos son 100% personalizables. Nuestros coaches adaptan el peso y la dificultad de cada ejercicio a tu nivel físico actual, garantizando un progreso seguro tanto si eres principiante como atleta avanzado.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>¿Cuáles son las formas de pago?</h3>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Aceptamos transferencia bancaria directa. Puedes realizar tu pago y subir la foto del comprobante (voucher) directamente en tu perfil de alumno. El administrador validará tu pago y tu cuenta se activará al instante.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>¿Qué pasa si mi suscripción vence?</h3>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>El sistema te notificará 3 días antes del vencimiento. Si no realizas el pago a tiempo, tu acceso se suspenderá temporalmente de forma automática. Podrás reactivarlo al instante subiendo tu comprobante de transferencia desde tu pantalla de inicio.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs Compat -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js?v=1.0.1"></script>
+    <script src="js/app.js?v=1.0.1"></script>
+    <script>
+        // Simple Carousel Logic para efecto WOW
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.hero-slide');
+        if(slides.length > 0) {
+            setInterval(() => {
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].classList.add('active');
+            }, 6000); // Cambia imagen cada 6 segundos
+        }
+
+        // Lógica de Acordeón para Preguntas Frecuentes (FAQ)
+        document.querySelectorAll('.faq-question').forEach(item => {
+            item.addEventListener('click', () => {
+                const parent = item.parentElement;
+                parent.classList.toggle('active');
+            });
+        });
+    </script>
+</body>
+</html>

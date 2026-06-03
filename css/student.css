@@ -1,0 +1,542 @@
+/* css/student.css */
+
+.student-body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: #f1f5f9;
+    overflow-x: hidden;
+}
+
+/* Background Image */
+.hero-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    /* Usa un gradiente gris moderno si no hay imagen, o una imagen fitness de stock */
+    background: linear-gradient(rgba(241, 245, 249, 0.5), rgba(241, 245, 249, 1)), url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1000&auto=format&fit=crop') center top / cover no-repeat;
+    z-index: -1;
+}
+
+.student-dashboard {
+    padding: 25px 20px 100px 20px;
+    max-width: 500px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Utilities Glassmorphism */
+.glassmorphism {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+/* Header */
+.student-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.profile-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    color: var(--text-muted);
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.greeting-box {
+    display: flex;
+    flex-direction: column;
+}
+
+.greeting {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.student-name {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text-main);
+    margin: 0;
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.glass-icon-btn {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.8);
+    border: none;
+    backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    color: var(--text-main);
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+/* Global Index Card */
+.global-index-card {
+    padding: 20px;
+    margin-bottom: 30px;
+}
+
+.card-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.card-top-row h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text-main);
+}
+
+.black-arrow-btn {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: #0f172a;
+    color: white;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(15, 23, 42, 0.4);
+    transition: transform 0.2s;
+}
+
+.black-arrow-btn:active {
+    transform: scale(0.9);
+}
+
+/* Progress Bars */
+.bars-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.bar-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.bar-row span {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-main);
+    width: 50px;
+}
+
+.progress-track {
+    flex-grow: 1;
+    height: 8px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.5s ease;
+}
+
+/* Big Stat Number */
+.big-stat-section {
+    margin-bottom: 40px;
+}
+
+.big-stat-section p {
+    margin: 0 0 5px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.big-stat-section h2 {
+    margin: 0;
+    font-size: 85px;
+    font-weight: 900;
+    letter-spacing: -3px;
+    color: var(--text-main);
+    line-height: 1;
+}
+
+/* Bottom Glass Panel (Mis Próximas Clases) */
+.bottom-glass-panel {
+    padding: 20px;
+    margin-bottom: auto; /* Push above the nav */
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.panel-header h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.text-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Horizontal Scroll for Next Classes */
+.horizontal-scroll {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scroll-snap-type: x mandatory;
+}
+
+.horizontal-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.class-card-horizontal {
+    min-width: 160px;
+    border-radius: 20px;
+    padding: 15px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+    scroll-snap-align: start;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.class-card-horizontal::before {
+    content: '';
+    position: absolute;
+    top:0; left:0; right:0; bottom:0;
+    background: linear-gradient(to bottom right, rgba(255,255,255,0.2), rgba(0,0,0,0.3));
+    z-index: 1;
+}
+
+.class-card-horizontal > * {
+    position: relative;
+    z-index: 2;
+}
+
+/* Bottom Nav Pill */
+.pill-nav {
+    position: fixed;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 350px;
+    background: rgba(30, 41, 59, 0.85); /* Oscuro translúcido */
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 40px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px;
+    z-index: 100;
+}
+
+.pill-nav .nav-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.5);
+    font-size: 20px;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.pill-nav .nav-btn.active {
+    color: white;
+}
+
+.pill-nav .nav-btn.main-action {
+    background: #a3e635; /* Verde manzana */
+    color: #0f172a;
+    box-shadow: 0 0 15px rgba(163, 230, 53, 0.5);
+}
+
+/* Modals */
+.full-screen-modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 200;
+    background: rgba(0,0,0,0.2);
+    display: flex;
+    align-items: flex-end; /* Aparece desde abajo */
+    transition: opacity 0.3s;
+}
+
+.full-screen-modal.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.modal-content.glassmorphism {
+    width: 100%;
+    height: 85vh; /* Ocupa el 85% de la pantalla */
+    border-radius: 30px 30px 0 0;
+    padding: 25px 20px;
+    background: rgba(248, 250, 252, 0.95);
+    transform: translateY(0);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.full-screen-modal.hidden .modal-content {
+    transform: translateY(100%);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text-main);
+}
+
+.vertical-scroll {
+    overflow-y: auto;
+    flex-grow: 1;
+    min-height: 0;
+    padding-bottom: 50px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Modales Responsivos y Centrados en Escritorio */
+@media (min-width: 768px) {
+    .full-screen-modal {
+        align-items: center !important;
+        justify-content: center !important;
+        background: rgba(15, 23, 42, 0.6) !important;
+    }
+    .modal-content.glassmorphism {
+        max-width: 520px !important;
+        height: auto !important;
+        max-height: 85vh !important;
+        border-radius: 24px !important;
+        margin: 0 auto !important;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+        border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    }
+}
+
+/* Estilos de Contraste y Premium para Vouchers */
+.voucher-text-primary {
+    color: #1e293b !important;
+}
+.voucher-text-secondary {
+    color: #475569 !important;
+}
+.voucher-text-muted {
+    color: #64748b !important;
+}
+.voucher-card-bento {
+    background: #f1f5f9 !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 16px !important;
+    padding: 16px !important;
+    margin-bottom: 20px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+.voucher-copy-item {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 10px !important;
+    padding: 10px 14px !important;
+    margin-bottom: 8px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+.voucher-copy-item:last-child {
+    margin-bottom: 0 !important;
+}
+.voucher-copy-label {
+    font-size: 10px !important;
+    color: #64748b !important;
+    margin: 0 !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+}
+.voucher-copy-val {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+    margin: 0 !important;
+}
+
+/* Dropzone Premium de Selección de Voucher */
+.voucher-dropzone {
+    padding: 24px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 12px !important;
+    border: 2px dashed #3b82f6 !important;
+    border-radius: 16px !important;
+    background: #eff6ff !important;
+    cursor: pointer !important;
+    position: relative !important;
+    transition: all 0.2s ease !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+.voucher-dropzone:hover {
+    background: #ecfdf5 !important;
+    border-color: #22c55e !important;
+}
+.voucher-dropzone i {
+    font-size: 32px !important;
+    color: #3b82f6 !important;
+    transition: color 0.2s ease !important;
+}
+.voucher-dropzone:hover i {
+    color: #22c55e !important;
+}
+.voucher-dropzone span {
+    font-size: 14px !important;
+    color: #1e3a8a !important;
+    font-weight: 700 !important;
+    transition: color 0.2s ease !important;
+}
+.voucher-dropzone:hover span {
+    color: #15803d !important;
+}
+
+/* Contenedor de Imagen de Datos y Vistas Previas */
+.voucher-img-container {
+    width: 100% !important;
+    max-height: 220px !important;
+    overflow: hidden !important;
+    border-radius: 16px !important;
+    border: 1px solid #e2e8f0 !important;
+    margin-bottom: 16px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    background: #f8fafc !important;
+    padding: 8px !important;
+    box-sizing: border-box !important;
+}
+.voucher-img-container img {
+    max-width: 100% !important;
+    max-height: 200px !important;
+    object-fit: contain !important;
+    border-radius: 10px !important;
+}
+
+/* =========================================================================
+   MODAL CLASES DISPONIBLES: MAQUETACIÓN RESPONSIVA Y VISTA PANORÁMICA 📅✨
+   ========================================================================= */
+
+/* Ensanchamiento del modal de reservar clases en pantallas de escritorio para visualización panorámica */
+@media (min-width: 768px) {
+    #modal-reservar .modal-content.glassmorphism {
+        max-width: 900px !important; /* Panel ancho y panorámico para ver toda la semana */
+    }
+}
+
+/* Contenedor responsivo de clases disponibles: Vertical en celular (pulgar scroll), horizontal bento en escritorio */
+#clases-disponibles-list {
+    display: flex !important;
+    flex-direction: column !important; /* Móvil: Apilamiento vertical ultra-cómodo */
+    gap: 20px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding-bottom: 10px !important;
+    width: 100% !important;
+}
+
+#clases-disponibles-list > div {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    flex-shrink: 0 !important;
+}
+
+@media (min-width: 768px) {
+    #clases-disponibles-list {
+        flex-direction: row !important; /* Escritorio: Columnas de días una al lado de otra */
+        flex-wrap: wrap !important; /* Envolver en filas si hay muchos días, eliminando scroll horizontal */
+        justify-content: flex-start !important;
+        overflow-x: visible !important;
+        overflow-y: visible !important;
+    }
+    
+    #clases-disponibles-list > div {
+        flex: 1 1 270px !important; /* Columnas flexibles con ancho base de 270px */
+        max-width: 320px !important;
+        min-width: 260px !important;
+        scroll-snap-align: none !important;
+    }
+}
+

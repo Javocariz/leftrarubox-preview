@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Leftrarubox</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css?v=1.0.1">
+    <link rel="stylesheet" href="css/admin.css?v=1.0.1">
+    <style>
+        /* === CORRECCIÓN CRÍTICA DE BLOQUEO DE MODALS (INLINE DE SEGURIDAD CONTRA CACHÉ LOCAL) === */
+        .modal-overlay {
+            z-index: 99999 !important;
+            pointer-events: auto !important;
+        }
+        .modal-card {
+            z-index: 100000 !important;
+            position: relative !important;
+            pointer-events: auto !important;
+        }
+        .modal-header, .modal-body {
+            position: relative !important;
+            z-index: 100010 !important;
+        }
+        .modal-body .input-group {
+            position: relative !important;
+        }
+        .modal-body .input-group i {
+            position: absolute !important;
+            left: 20px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            z-index: 10 !important;
+            pointer-events: none !important;
+            color: var(--text-muted) !important;
+        }
+        .modal-body .input-group input, 
+        .modal-body .input-group select, 
+        .modal-body .input-group textarea {
+            position: relative !important;
+            z-index: 5 !important;
+            pointer-events: auto !important;
+            width: 100% !important;
+            background: var(--bg-color) !important;
+        }
+        .modal-body .input-group input:focus,
+        .modal-body .input-group select:focus,
+        .modal-body .input-group textarea:focus {
+            background: white !important;
+            border-color: var(--success-color) !important;
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- HEADER GLOBAL -->
+    <header class="global-header">
+        <div class="logo-area">
+            <div class="logo-circle-small"><i class="fa-solid fa-dumbbell"></i></div>
+            <h2>Leftraru<span>box</span></h2>
+        </div>
+        <div class="user-profile-mini">
+            <span id="current-date">--/--/----</span>
+            <button class="btn-icon" id="btn-logout-header" title="Cerrar Sesión"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        
+        <!-- MÓDULO: MENÚ PRINCIPAL (GRID 3x3) -->
+        <section id="menu-principal" class="module active">
+            <h2 class="section-title">Menú Principal</h2>
+            <div class="menu-grid">
+                
+                <!-- FILA 1 -->
+                <div class="menu-card" data-target="dashboard">
+                    <div class="menu-icon-wrapper" style="background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);">
+                        <i class="fa-solid fa-chart-pie"></i>
+                    </div>
+                    <h3>Análisis</h3>
+                    <p>Dashboard Estadístico</p>
+                </div>
+
+                <div class="menu-card" data-target="alumnos">
+                    <div class="menu-icon-wrapper" style="background: linear-gradient(135deg, #a855f7 0%, #d946ef 100%);">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <h3>Alumnos</h3>
+                    <p>Gestión de Clientes</p>
+                </div>
+
+                <div class="menu-card" data-target="profesores">
+                    <div class="menu-icon-wrapper" style="background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);">
+                        <i class="fa-solid fa-user-tie"></i>
+                    </div>
+                    <h3>Personal</h3>
+                    <p>Gestión de Profesores</p>
+                </div>
+
+                <!-- FILA 2 -->
+                <div class="menu-card" data-target="planificacion">
+                    <div class="menu-icon-wrapper" style="background: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);">
+                        <i class="fa-regular fa-calendar-check"></i>
+                    </div>
+                    <h3>Planificación</h3>
+                    <p>Horarios y Clases</p>
+                </div>
+
+                <div class="menu-card" data-target="ejercicios">
+                    <div class="menu-icon-wrapper" style="background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);">
+                        <i class="fa-solid fa-person-running"></i>
+                    </div>
+                    <h3>Ejercicios</h3>
+                    <p>Catálogo Muscular</p>
+                </div>
+
+                <div class="menu-card" data-target="suscripciones">
+                    <div class="menu-icon-wrapper" style="background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);">
+                        <i class="fa-solid fa-ticket"></i>
+                    </div>
+                    <h3>Servicios</h3>
+                    <p>Suscripciones y Valores</p>
+                </div>
+
+                <!-- FILA 3 -->
+                <div class="menu-card" data-target="ingresos">
+                    <div class="menu-icon-wrapper" style="background: linear-gradient(135deg, #14b8a6 0%, #06b6d4 100%);">
+                        <i class="fa-solid fa-hand-holding-dollar"></i>
+                    </div>
+                    <h3>Finanzas</h3>
+                    <p>Registro de Ingresos</p>
+                </div>
+
+                <div class="menu-card" data-target="configuracion">
+                    <div class="menu-icon-wrapper" style="background: linear-gradient(135deg, #64748b 0%, #94a3b8 100%);">
+                        <i class="fa-solid fa-gear"></i>
+                    </div>
+                    <h3>Sistema</h3>
+                    <p>Configuración App</p>
+                </div>
+
+                <div class="menu-card" id="btn-logout-card">
+                    <div class="menu-icon-wrapper" style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%);">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    </div>
+                    <h3>Salir</h3>
+                    <p>Cerrar Sesión</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ==============================
+             MÓDULOS DE CONTENIDO
+             ============================== -->
+
+        <section id="dashboard" class="module" style="max-width:100%; width:100%;">
+            <div class="module-header">
+                <button class="btn-back-menu"><i class="fa-solid fa-arrow-left"></i> Volver al Menú</button>
+                <div class="header-actions">
+                    <h2 class="module-title">Análisis de Desempeño</h2>
+                </div>
+            </div>
+            
+            <!-- CONTENEDOR GRID PRINCIPAL -->
+            <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:20px; width:100%; padding-bottom:40px;">
+                
+                <!-- === FILA 1 === -->
+                <!-- Tarjeta 1 -->
+                <div style="background:white; border-radius:24px; padding:20px 25px; box-shadow:var(--shadow-soft); display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <p style="font-size:14px; color:var(--text-muted); font-weight:600; margin:0 0 5px 0;">Ingresos del mes</p>
+                        <h3 id="kpi-ingresos" style="font-size:26px; font-weight:800; margin:0; color:var(--text-main);">$0</h3>
+                    </div>
+                    <div style="display:flex; gap:4px; align-items:flex-end; height:35px; width:50px;">
+                        <div style="width:20%; background:#cbd5e1; height:40%; border-radius:2px;"></div>
+                        <div style="width:20%; background:#94a3b8; height:70%; border-radius:2px;"></div>
+                        <div style="width:20%; background:#10b981; height:100%; border-radius:2px;"></div>
+                        <div style="width:20%; background:#94a3b8; height:50%; border-radius:2px;"></div>
+                        <div style="width:20%; background:#cbd5e1; height:80%; border-radius:2px;"></div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 2 -->
+                <div style="background:white; border-radius:24px; padding:20px 25px; box-shadow:var(--shadow-soft); display:flex; justify-content:space-between; align-items:center;">
+                    <div style="display:flex; gap:15px; align-items:center;">
+                        <div style="width:45px; height:45px; border-radius:50%; background:#f0fdf4; color:#10b981; display:flex; justify-content:center; align-items:center; font-size:18px;">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <div>
+                            <p style="font-size:14px; color:var(--text-muted); font-weight:600; margin:0 0 5px 0;">Alumnos Activos</p>
+                            <h3 id="kpi-alumnos" style="font-size:26px; font-weight:800; margin:0; color:var(--text-main);">0</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 3 -->
+                <div style="background:white; border-radius:24px; padding:20px 25px; box-shadow:var(--shadow-soft); display:flex; justify-content:space-between; align-items:center;">
+                    <div style="display:flex; gap:15px; align-items:center;">
+                        <div style="width:45px; height:45px; border-radius:50%; background:#fef3c7; color:#d97706; display:flex; justify-content:center; align-items:center; font-size:18px;">
+                            <i class="fa-solid fa-sack-dollar"></i>
+                        </div>
+                        <div>
+                            <p style="font-size:14px; color:var(--text-muted); font-weight:600; margin:0 0 5px 0;">Plan Más Vendido</p>
+                            <h3 id="kpi-plan" style="font-size:18px; font-weight:800; margin:0; color:var(--text-main);">Calculando...</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 4 (Verde) -->
+                <div style="background:#678070; border-radius:24px; padding:20px 25px; box-shadow:var(--shadow-soft); display:flex; justify-content:space-between; align-items:center; color:white;">
+                    <div>
+                        <p style="font-size:14px; font-weight:600; margin:0 0 5px 0; opacity:0.9;">Clases Programadas</p>
+                        <h3 id="kpi-clases" style="font-size:26px; font-weight:800; margin:0;">0</h3>
+                    </div>
+                    <div style="font-size:30px; opacity:0.8;">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                </div>
+
+                <!-- === FILA 2 === -->
+                <!-- Bloque Balance (Ocupa 2 columnas) -->
+                <div style="grid-column: span 2; background:white; border-radius:24px; padding:30px; box-shadow:var(--shadow-soft); border:1px solid rgba(0,0,0,0.02); display:flex; flex-direction:column;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
+                        <h4 style="margin:0; color:var(--text-main); font-size:22px; font-weight:800; display:flex; align-items:center; gap:8px;">
+                            Balance General <span style="background:#f0fdf4; color:#10b981; font-size:11px; padding:4px 10px; border-radius:20px; font-weight:700;"><i class="fa-solid fa-circle-check"></i> En buen camino</span>
+                        </h4>
+                        <div style="display:flex; gap:6px; align-items:center;">
+                            <!-- Selector Período -->
+                            <select id="balance-periodo" style="font-size:12px; color:#475569; background:#f1f5f9; border:none; padding:6px 12px; border-radius:8px; font-weight:600; cursor:pointer; outline:none; font-family:'Inter', sans-serif;">
+                                <option value="6meses">Últimos 6 meses</option>
+                                <option value="anio">Año Completo</option>
+                                <option value="mes">Mes Específico</option>
+                            </select>
+                            
+                            <!-- Selector Año (Dinámico) -->
+                            <select id="balance-anio" style="font-size:12px; color:#475569; background:#f1f5f9; border:none; padding:6px 12px; border-radius:8px; font-weight:600; cursor:pointer; outline:none; font-family:'Inter', sans-serif;">
+                                <!-- Se llenará dinámicamente -->
+                            </select>
+
+                            <!-- Selector Mes (Solo si periodo es 'mes') -->
+                            <select id="balance-mes" style="font-size:12px; color:#475569; background:#f1f5f9; border:none; padding:6px 12px; border-radius:8px; font-weight:600; cursor:pointer; outline:none; font-family:'Inter', sans-serif; display:none;">
+                                <option value="0">Enero</option>
+                                <option value="1">Febrero</option>
+                                <option value="2">Marzo</option>
+                                <option value="3">Abril</option>
+                                <option value="4">Mayo</option>
+                                <option value="5">Junio</option>
+                                <option value="6">Julio</option>
+                                <option value="7">Agosto</option>
+                                <option value="8">Septiembre</option>
+                                <option value="9">Octubre</option>
+                                <option value="10">Noviembre</option>
+                                <option value="11">Diciembre</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div style="display:flex; gap:40px; margin-bottom:20px;">
+                        <div>
+                            <p style="font-size:13px; color:var(--text-muted); margin:0 0 5px 0;">Recaudado en Selección</p>
+                            <h3 id="kpi-total-historico" style="font-size:24px; font-weight:800; margin:0; color:var(--text-main);">$0</h3>
+                        </div>
+                    </div>
+
+                    <div style="position:relative; height:180px; width:100%; flex-grow:1;">
+                        <canvas id="chart-ingresos"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Bloque Earnings (Ocupa 1 columna) -->
+                <div style="grid-column: span 1; background:white; border-radius:24px; padding:30px; box-shadow:var(--shadow-soft); border:1px solid rgba(0,0,0,0.02); display:flex; flex-direction:column; align-items:center;">
+                    <div style="width:100%;">
+                        <h4 style="margin:0 0 5px 0; color:var(--text-main); font-size:20px; font-weight:800;">Rentabilidad</h4>
+                        <p style="margin:0 0 10px 0; font-size:13px; color:var(--text-muted);">Ingresos vs Capacidad</p>
+                        <h3 style="font-size:28px; font-weight:800; margin:0 0 5px 0; color:#4b6b5d;">Optimizando</h3>
+                        <p style="margin:0 0 15px 0; font-size:12px; color:var(--text-muted);">La asistencia general es estable</p>
+                    </div>
+                    
+                    <div style="position:relative; height:160px; width:100%; margin-top:auto;">
+                        <canvas id="chart-clases"></canvas>
+                    </div>
+                </div>
+
+                <!-- Bloque Perfil (Ocupa 1 columna) -->
+                <div style="grid-column: span 1; background:white; border-radius:24px; padding:30px; box-shadow:var(--shadow-soft); border:1px solid rgba(0,0,0,0.02); display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                    <div style="width:80px; height:80px; border-radius:50%; background:var(--primary-gradient); display:flex; justify-content:center; align-items:center; font-size:35px; color:white; margin-bottom:15px; box-shadow:var(--shadow-glow);">
+                        <i class="fa-solid fa-crown"></i>
+                    </div>
+                    <h3 style="font-size:20px; font-weight:800; margin:0 0 5px 0; color:var(--text-main);">Leftrarubox</h3>
+                    <p style="font-size:14px; color:var(--text-muted); margin:0 0 25px 0;">Administración Central</p>
+                    
+                    <div style="display:flex; justify-content:space-between; width:100%; text-align:center;">
+                        <div>
+                            <p style="font-size:12px; color:var(--text-muted); margin:0 0 5px 0;">Profesores</p>
+                            <h4 id="kpi-profes" style="font-size:20px; font-weight:800; margin:0; color:var(--text-main);">0</h4>
+                        </div>
+                        <div>
+                            <p style="font-size:12px; color:var(--text-muted); margin:0 0 5px 0;">Planes</p>
+                            <h4 id="kpi-planes" style="font-size:20px; font-weight:800; margin:0; color:var(--text-main);">0</h4>
+                        </div>
+                        <div>
+                            <p style="font-size:12px; color:var(--text-muted); margin:0 0 5px 0;">Ejercicios</p>
+                            <h4 id="kpi-ejs" style="font-size:20px; font-weight:800; margin:0; color:var(--text-main);">0</h4>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- BLOQUE NUEVO: Alumnos -->
+        <section id="alumnos" class="module">
+            <div class="module-header">
+                <button class="btn-back-menu"><i class="fa-solid fa-arrow-left"></i> Volver al Menú</button>
+                <div class="header-actions">
+                    <h2 class="module-title">Alumnos</h2>
+                    <button class="btn-primary btn-sm" id="btn-add-alumno"><i class="fa-solid fa-plus"></i> Nuevo Alumno</button>
+                </div>
+            </div>
+            <div class="cards-grid" id="alumnos-list"></div>
+        </section>
+
+        <section id="profesores" class="module">
+            <div class="module-header">
+                <button class="btn-back-menu"><i class="fa-solid fa-arrow-left"></i> Volver al Menú</button>
+                <div class="header-actions">
+                    <h2 class="module-title">Personal</h2>
+                    <button class="btn-primary btn-sm" id="btn-add-profesor"><i class="fa-solid fa-plus"></i> Nuevo Profesor</button>
+                </div>
+            </div>
+            <div class="cards-grid" id="profesores-list"></div>
+        </section>
+
+        <!-- BLOQUE NUEVO: Planificación -->
+        <section id="planificacion" class="module">
+            <div class="module-header">
+                <button class="btn-back-menu"><i class="fa-solid fa-arrow-left"></i> Volver al Menú</button>
+                <div class="header-actions">
+                    <h2 class="module-title">Planificación</h2>
+                    <button class="btn-primary btn-sm" id="btn-add-clase"><i class="fa-solid fa-calendar-plus"></i> Nueva Clase</button>
+                </div>
+            </div>
+            
+            <!-- Filtros Rápidos de Planificación -->
+            <div class="tab-filters" style="display:flex; gap:10px; margin-bottom:20px; border-bottom:1px solid #e2e8f0; padding-bottom:12px; width:100%;">
+                <button class="tab-btn active" id="btn-filter-proximas" style="background:#678070; color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:800; cursor:pointer; font-size:13px; display:flex; align-items:center; gap:6px; transition:all 0.2s ease;"><i class="fa-regular fa-calendar"></i> Próximas Clases</button>
+                <button class="tab-btn" id="btn-filter-historial" style="background:#f1f5f9; color:#475569; border:none; padding:8px 16px; border-radius:8px; font-weight:800; cursor:pointer; font-size:13px; display:flex; align-items:center; gap:6px; transition:all 0.2s ease;"><i class="fa-solid fa-clock-rotate-left"></i> Historial de Clases Pasadas</button>
+            </div>
+            
+            <div class="cards-grid" id="planificacion-list"></div>
+        </section>
+
+        <section id="ejercicios" class="module">
+            <div class="module-header">
+                <button class="btn-back-menu"><i class="fa-solid fa-arrow-left"></i> Volver al Menú</button>
+                <div class="header-actions">
+                    <h2 class="module-title">Ejercicios</h2>
+                    <button class="btn-primary btn-sm" id="btn-add-ejercicio"><i class="fa-solid fa-plus"></i> Nuevo Ejercicio</button>
+                </div>
+            </div>
+            <div class="cards-grid" id="ejercicios-list"></div>
+        </section>
+
+        <section id="suscripciones" class="module">
+            <div class="module-header">
+                <button class="btn-back-menu"><i class="fa-solid fa-arrow-left"></i> Volver al Menú</button>
+                <div class="header-actions">
+                    <h2 class="module-title">Servicios</h2>
+                    <button class="btn-primary btn-sm" id="btn-add-suscripcion"><i class="fa-solid fa-plus"></i> Nueva Suscripción</button>
+                </div>
+            </div>
+            <div class="cards-grid" id="suscripciones-list"></div>
+        </section>
+
+        <!-- BLOQUE NUEVO: Ingresos (Finanzas) -->
+        <section id="ingresos" class="module">
+            <div class="module-header">
+                <button class="btn-back-menu"><i class="fa-solid fa-arrow-left"></i> Volver al Menú</button>
+                <div class="header-actions">
+                    <h2 class="module-title">Finanzas</h2>
+                    <button class="btn-primary btn-sm" id="btn-add-ingreso"><i class="fa-solid fa-hand-holding-dollar"></i> Registrar Pago</button>
+                </div>
+            </div>
+            <div class="cards-grid" id="ingresos-list"></div>
+        </section>
+
+        <section id="configuracion" class="module">
+            <div class="module-header">
+                <button class="btn-back-menu"><i class="fa-solid fa-arrow-left"></i> Volver al Menú</button>
+                <div class="header-actions">
+                    <h2 class="module-title">Sistema</h2>
+                </div>
+            </div>
+            <div class="data-card" style="max-width: 400px; width:100%;">
+                <h4 style="margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;"><i class="fa-solid fa-gear" style="color:var(--text-muted); margin-right:8px;"></i>Ajustes Generales</h4>
+                
+                <p style="font-size:13px; font-weight:600; color:var(--text-main); margin:0 0 5px 0;">Política de Cancelación</p>
+                <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">Horas límite antes de la clase para cancelar la reserva sin descontar cupo.</p>
+                <div class="input-group" style="margin-bottom:20px;">
+                    <i class="fa-regular fa-clock"></i>
+                    <input type="number" id="horas-limite" min="0" value="2" style="background:#f4f4f9;">
+                </div>
+
+                <p style="font-size:13px; font-weight:600; color:var(--text-main); margin:0 0 5px 0;">Atención al Cliente (WhatsApp)</p>
+                <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">Número telefónico que aparecerá en el portal principal (incluye código de país, ej. 56912345678).</p>
+                <div class="input-group" style="margin-bottom:20px;">
+                    <i class="fa-brands fa-whatsapp" style="color:#25d366;"></i>
+                    <input type="text" id="config-whatsapp" placeholder="Ej: 56912345678" style="background:#f4f4f9;">
+                </div>
+
+                <button class="btn-primary btn-sm" id="btn-save-config" style="width:100%;">Guardar Configuración</button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal Genérico -->
+    <div class="modal-overlay hidden" id="generic-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modal-title">Título</h3>
+                <button class="btn-icon" id="btn-close-modal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Firebase SDKs Compat -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js?v=1.0.1"></script>
+    <script src="js/admin.js?v=1.1.1"></script>
+</body>
+</html>
