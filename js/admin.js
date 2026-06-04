@@ -1392,6 +1392,37 @@ document.addEventListener('DOMContentLoaded', () => {
         printWin.document.close();
     };
 
+    const buildClassTimeSelector = (value = '19:00') => {
+        const [selectedHour = '19', selectedMinute = '00'] = (value || '19:00').split(':');
+        const hourOptions = Array.from({ length: 24 }, (_, i) => {
+            const hour = String(i).padStart(2, '0');
+            return `<option value="${hour}" ${hour === selectedHour ? 'selected' : ''}>${hour}</option>`;
+        }).join('');
+        const minuteOptions = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0')).map(minute => {
+            return `<option value="${minute}" ${minute === selectedMinute ? 'selected' : ''}>${minute}</option>`;
+        }).join('');
+
+        return `
+            <div class="input-group" style="flex:1; margin-bottom:0;">
+                <i class="fa-solid fa-clock" style="z-index:2;"></i>
+                <div style="display:flex; width:100%; gap:8px;">
+                    <select id="cl-hora-hour" required title="Hora" style="padding:13px 10px 13px 45px; text-align:center;">
+                        ${hourOptions}
+                    </select>
+                    <select id="cl-hora-minute" required title="Minutos" style="padding:13px 10px; text-align:center;">
+                        ${minuteOptions}
+                    </select>
+                </div>
+            </div>
+        `;
+    };
+
+    const getClassTimeValue = () => {
+        const hour = document.getElementById('cl-hora-hour').value;
+        const minute = document.getElementById('cl-hora-minute').value;
+        return `${hour}:${minute}`;
+    };
+
     document.getElementById('btn-add-clase').addEventListener('click', () => {
         if(db.profesores.length === 0) {
             alert("Debes crear al menos un Profesor en el módulo de Personal antes de planificar clases.");
@@ -1418,10 +1449,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <i class="fa-solid fa-calendar-day" style="z-index:2;"></i>
                         <input type="date" id="cl-fecha" required title="Fecha de la clase">
                     </div>
-                    <div class="input-group" style="flex:1; margin-bottom:0;">
-                        <i class="fa-solid fa-clock" style="z-index:2;"></i>
-                        <input type="time" id="cl-hora" required title="Hora de inicio">
-                    </div>
+                    ${buildClassTimeSelector()}
                 </div>
 
                 <div class="input-group">
@@ -1456,7 +1484,7 @@ document.addEventListener('DOMContentLoaded', () => {
             dbRef.collection("clases").add({
                 nombre: document.getElementById('cl-nombre').value,
                 fecha: document.getElementById('cl-fecha').value,
-                hora: document.getElementById('cl-hora').value,
+                hora: getClassTimeValue(),
                 profesor: document.getElementById('cl-profesor').value,
                 ejercicios: ejs,
                 alumnosInscritos: []
@@ -1499,10 +1527,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <i class="fa-solid fa-calendar-day" style="z-index:2;"></i>
                         <input type="date" id="cl-fecha" value="${clase.fecha}" required>
                     </div>
-                    <div class="input-group" style="flex:1; margin-bottom:0;">
-                        <i class="fa-solid fa-clock" style="z-index:2;"></i>
-                        <input type="time" id="cl-hora" value="${clase.hora}" required>
-                    </div>
+                    ${buildClassTimeSelector(clase.hora)}
                 </div>
 
                 <div class="input-group">
@@ -1531,7 +1556,7 @@ document.addEventListener('DOMContentLoaded', () => {
             dbRef.collection("clases").doc(clase.id).set({
                 nombre: document.getElementById('cl-nombre').value,
                 fecha: document.getElementById('cl-fecha').value,
-                hora: document.getElementById('cl-hora').value,
+                hora: getClassTimeValue(),
                 profesor: document.getElementById('cl-profesor').value,
                 ejercicios: ejs,
                 alumnosInscritos: clase.alumnosInscritos || [],
