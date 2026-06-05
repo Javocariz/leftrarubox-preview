@@ -901,6 +901,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // MÓDULO: INGRESOS (FINANZAS)
     // ==========================================
     let ingresosFilter = 'todos'; // 'todos', 'pagados', 'pendientes', 'validar'
+    let invitacionesSearch = '';
     
     const renderIngresos = () => {
         const container = document.getElementById('ingresos-list');
@@ -2074,6 +2075,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!container) return;
 
         const invitaciones = normalizarInvitaciones();
+        const query = invitacionesSearch.trim().toLowerCase();
+        const invitacionesFiltradas = query
+            ? invitaciones.filter(inv => inv.correo.includes(query))
+            : invitaciones;
         container.innerHTML = '';
 
         const disponibles = invitaciones.filter(inv => !inv.usado).length;
@@ -2090,6 +2095,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 <h4>${usadas}</h4>
                 <p>Invitaciones que ya crearon perfil de alumno.</p>
             </div>
+            <div class="data-card" style="min-width:100%; grid-column:1 / -1;">
+                <div class="input-group" style="margin:0;">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="search" id="invitaciones-search" placeholder="Buscar correo autorizado" value="${invitacionesSearch}">
+                </div>
+                <p style="font-size:12px; color:var(--text-muted); margin:10px 0 0 0;">Puedes borrar una invitacion usada si el alumno fue eliminado y necesitas autorizar ese correo nuevamente.</p>
+            </div>
         `;
 
         if (invitaciones.length === 0) {
@@ -2097,20 +2109,36 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        invitaciones.forEach((inv, idx) => {
+        if (invitacionesFiltradas.length === 0) {
+            container.innerHTML += '<p style="color:var(--text-muted); font-size:14px; width:100%;">No hay invitaciones que coincidan con la busqueda.</p>';
+        }
+
+        invitacionesFiltradas.forEach((inv) => {
+            const idx = invitaciones.findIndex(item => item.correo === inv.correo);
             container.innerHTML += `
                 <div class="data-card">
                     <span class="badge" style="background:${inv.usado ? '#e2e8f0' : '#dcfce7'}; color:${inv.usado ? '#475569' : '#15803d'};">${inv.usado ? 'Usada' : 'Disponible'}</span>
                     <h4>${inv.correo}</h4>
                     <p>${inv.usado ? `Cuenta creada${inv.usadoEn ? ` el ${inv.usadoEn}` : ''}` : `Autorizado desde ${inv.creadoEn || 'hoy'}`}</p>
-                    ${inv.usado ? '' : `
-                        <div class="card-actions">
-                            <button class="btn-icon delete" onclick="deleteInvitacion(${idx})" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    `}
+                    <div class="card-actions">
+                        <button class="btn-icon delete" onclick="deleteInvitacion(${idx})" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                    </div>
                 </div>
             `;
         });
+
+        const searchInput = document.getElementById('invitaciones-search');
+        if (searchInput) {
+            searchInput.addEventListener('input', (event) => {
+                invitacionesSearch = event.target.value;
+                renderInvitaciones();
+                const nextInput = document.getElementById('invitaciones-search');
+                if (nextInput) {
+                    nextInput.focus();
+                    nextInput.setSelectionRange(nextInput.value.length, nextInput.value.length);
+                }
+            });
+        }
     };
 
     const fechaKey = (date) => {
@@ -2172,9 +2200,12 @@ document.addEventListener('DOMContentLoaded', () => {
     window.deleteInvitacion = (idx) => {
         const invitaciones = normalizarInvitaciones();
         const inv = invitaciones[idx];
-        if (!inv || inv.usado) return;
+        if (!inv) return;
 
-        if (confirm(`Quitar autorizacion para ${inv.correo}?`)) {
+        const detalle = inv.usado
+            ? `Esta invitacion ya fue usada${inv.alumnoId ? ' y tuvo un perfil asociado' : ''}. Si el alumno fue eliminado, podras autorizar este correo nuevamente.`
+            : 'Este correo dejara de estar autorizado.';
+        if (confirm(`${detalle}\n\nQuitar autorizacion para ${inv.correo}?`)) {
             guardarInvitaciones(invitaciones.filter((_, i) => i !== idx))
                 .catch(err => alert("Error al eliminar invitacion: " + err));
         }
