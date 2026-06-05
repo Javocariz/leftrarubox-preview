@@ -112,10 +112,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnCreateClass && modalCreateClass) {
         btnCreateClass.addEventListener('click', () => {
-            fillCreateClassDefaults();
-            modalCreateClass.classList.remove('hidden');
+            window.openTeacherCreateClass();
         });
     }
+
+    window.openTeacherCreateClass = () => {
+        if (!modalCreateClass) return;
+        fillCreateClassDefaults();
+        modalCreateClass.classList.remove('hidden');
+    };
 
     if (btnCloseCreateClass && modalCreateClass) {
         btnCloseCreateClass.addEventListener('click', () => {
@@ -199,9 +204,12 @@ document.addEventListener('DOMContentLoaded', () => {
         clasesListEl.innerHTML = '';
         if (clasesRender.length === 0) {
             clasesListEl.innerHTML = `
-                <div style="text-align:center; padding:40px; background:rgba(255,255,255,0.6); border-radius:20px; border:1px solid rgba(255,255,255,0.4);">
-                    <i class="fa-solid fa-folder-open" style="font-size:32px; color:var(--text-muted); margin-bottom:10px;"></i>
-                    <p style="margin:0; color:var(--text-muted); font-size:14px; font-weight:600;">No tienes clases planificadas para esta sección.</p>
+                <div class="trainer-empty-card">
+                    <i class="fa-solid fa-folder-open"></i>
+                    <p>No tienes clases planificadas para esta seccion.</p>
+                    <button type="button" onclick="openTeacherCreateClass()">
+                        <i class="fa-solid fa-calendar-plus"></i> Crear Clase
+                    </button>
                 </div>
             `;
             return;
@@ -261,7 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
             card.style = borderStyle;
             card.innerHTML = `
                 <div class="class-card-header">
-                    <span class="class-time"><i class="fa-regular fa-clock" style="color:#678070; font-size:13px;"></i> ${clase.hora} hs</span>
+                    <span class="class-time"><i class="fa-regular fa-clock"></i> ${clase.hora} hs</span>
                     ${diaBadgeHTML}
                 </div>
                 <h3 class="class-name">${clase.nombre || 'Entrenamiento'}</h3>

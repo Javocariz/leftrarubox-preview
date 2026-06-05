@@ -28,9 +28,7 @@
                 </div>
             </div>
             <div class="header-actions">
-                <button class="glass-icon-btn" id="btn-create-class" title="Crear Clase" style="color:#15803d;">
-                    <i class="fa-solid fa-plus"></i>
-                </button>                <button class="glass-icon-btn" id="btn-logout" title="Cerrar Sesión">
+                <button class="glass-icon-btn" id="btn-logout" title="Cerrar Sesión">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i>
                 </button>
             </div>
@@ -66,7 +64,12 @@
 
         <!-- FEED DE CLASES -->
         <section class="classes-feed-section">
-            <h2 class="feed-title" id="feed-title">Mi Agenda de Clases</h2>
+            <div class="feed-title-row">
+                <h2 class="feed-title" id="feed-title">Mi Agenda de Clases</h2>
+                <button class="feed-create-btn" id="btn-create-class" title="Crear Clase">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+            </div>
             <div class="classes-list" id="trainer-clases-list">
                 <!-- Inyectado dinámicamente -->
                 <p style="text-align:center; color:var(--text-muted); font-size:14px; padding:40px;">Cargando planificación...</p>

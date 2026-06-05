@@ -177,12 +177,70 @@
     flex-direction: column;
 }
 
+.feed-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0 0 15px 0;
+}
+
 .feed-title {
     font-size: 16px;
     font-weight: 800;
     color: var(--text-main);
-    margin: 0 0 15px 0;
+    margin: 0;
     letter-spacing: 0.3px;
+}
+
+.feed-create-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 14px;
+    background: #678070;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(103, 128, 112, 0.22);
+}
+
+.trainer-empty-card {
+    text-align: center;
+    padding: 34px 24px;
+    background: rgba(255,255,255,0.6);
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.4);
+}
+
+.trainer-empty-card i {
+    font-size: 32px;
+    color: #60718b;
+    margin-bottom: 10px;
+}
+
+.trainer-empty-card p {
+    margin: 0 0 18px 0;
+    color: #4f6382;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.trainer-empty-card button {
+    border: none;
+    border-radius: 14px;
+    background: #678070;
+    color: white;
+    padding: 12px 18px;
+    font-size: 13px;
+    font-weight: 900;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 8px 18px rgba(103, 128, 112, 0.22);
 }
 
 .classes-list {
@@ -218,12 +276,21 @@
 }
 
 .class-time {
-    font-size: 16px;
-    font-weight: 800;
+    font-size: 13px;
+    font-weight: 900;
     color: var(--text-main);
+    background: rgba(103, 128, 112, 0.10);
+    border: 1px solid rgba(103, 128, 112, 0.16);
+    border-radius: 12px;
+    padding: 7px 10px;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 7px;
+}
+
+.class-time i {
+    color: #678070 !important;
+    font-size: 12px !important;
 }
 
 .class-date-badge {
