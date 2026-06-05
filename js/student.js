@@ -109,6 +109,32 @@ document.addEventListener('DOMContentLoaded', () => {
         if(btnId) document.getElementById(btnId).classList.add('active');
     };
 
+    const buildStudentNotifications = () => {
+        currentUser = db.alumnos[currentUserIndex];
+        const notices = [];
+        const now = new Date();
+        const caducidad = currentUser && currentUser.caducidad ? new Date(currentUser.caducidad) : null;
+        const diasFaltantes = caducidad ? Math.ceil((caducidad - now) / (1000 * 60 * 60 * 24)) : null;
+
+        if (currentUser?.voucherPendiente) {
+            notices.push(`Pago por validar: ${currentUser.voucherPendiente.planNombre || 'Plan solicitado'}`);
+        }
+        const historial = Array.isArray(currentUser?.voucherHistorial) ? currentUser.voucherHistorial.slice(0, 2) : [];
+        historial.forEach(item => notices.push(`${item.estado === 'aprobado' ? 'Pago aprobado' : 'Pago rechazado'}: ${item.planNombre || 'Plan'}`));
+        if (caducidad && diasFaltantes < 0) notices.push('Plan vencido: sube tu voucher para renovar.');
+        else if (caducidad && diasFaltantes <= 3) notices.push(`Plan por vencer: quedan ${diasFaltantes} dias.`);
+        if ((currentUser?.creditos || 0) <= 1) notices.push(`Creditos bajos: quedan ${currentUser?.creditos || 0} clases.`);
+
+        db.clases
+            .filter(c => c.alumnosInscritos && c.alumnosInscritos.includes(currentUserEmail))
+            .filter(c => new Date(`${c.fecha}T${c.hora || '00:00'}`) >= now)
+            .sort((a, b) => `${a.fecha}T${a.hora}`.localeCompare(`${b.fecha}T${b.hora}`))
+            .slice(0, 3)
+            .forEach(c => notices.push(`Clase reservada: ${c.nombre || 'Clase'} - ${c.fecha} ${c.hora || ''}`));
+
+        return notices;
+    };
+
     // BOTÓN HOME
     document.getElementById('btn-nav-home').addEventListener('click', () => {
         updateNavActive('btn-nav-home');
@@ -130,7 +156,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // BOTÓN NOTIFICACIONES (CABECERA Y BOTTOM PILL)
     const openBellNotification = () => {
-        alert("No tienes notificaciones nuevas.");
+        const notices = buildStudentNotifications();
+        alert(notices.length ? `Notificaciones:\n\n${notices.map(item => `- ${item}`).join('\n')}` : "No tienes notificaciones nuevas.");
     };
     
     const btnBellHeader = document.getElementById('btn-bell-notifications');

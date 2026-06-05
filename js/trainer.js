@@ -28,13 +28,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const tabHoyBtn = document.getElementById('tab-hoy');
     const tabHistorialBtn = document.getElementById('tab-historial');
     const btnLogout = document.getElementById('btn-logout');
+    const btnCreateClass = document.getElementById('btn-create-class');
 
     const modalAttendance = document.getElementById('modal-attendance');
+    const modalCreateClass = document.getElementById('modal-create-class');
     const modalClassTitle = document.getElementById('modal-class-title');
     const modalClassTime = document.getElementById('modal-class-time');
     const studentsAttendanceList = document.getElementById('students-attendance-list');
     const btnSaveAttendance = document.getElementById('btn-save-attendance');
     const btnCloseAttendance = document.getElementById('btn-close-attendance');
+    const btnCloseCreateClass = document.getElementById('btn-close-create-class');
+    const formCreateClass = document.getElementById('form-create-class');
 
     // Cargar Nombre de Profesor en el Encabezado
     if (trainerNameEl) {
@@ -51,6 +55,21 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const todayStr = getLocalDateStr();
+
+    const fillCreateClassDefaults = () => {
+        const dateInput = document.getElementById('teacher-class-date');
+        const hourSelect = document.getElementById('teacher-class-hour');
+        const minuteSelect = document.getElementById('teacher-class-minute');
+        if (dateInput) dateInput.value = getLocalDateStr();
+        if (hourSelect && !hourSelect.options.length) {
+            for (let hour = 5; hour <= 23; hour++) {
+                const value = String(hour).padStart(2, '0');
+                hourSelect.insertAdjacentHTML('beforeend', `<option value="${value}">${value}</option>`);
+            }
+            hourSelect.value = '08';
+        }
+        if (minuteSelect) minuteSelect.value = '00';
+    };
 
     // Configurar Escuchadores en Tiempo Real de Firebase
     const setupRealtimeListeners = () => {
@@ -90,6 +109,49 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     setupRealtimeListeners();
+
+    if (btnCreateClass && modalCreateClass) {
+        btnCreateClass.addEventListener('click', () => {
+            fillCreateClassDefaults();
+            modalCreateClass.classList.remove('hidden');
+        });
+    }
+
+    if (btnCloseCreateClass && modalCreateClass) {
+        btnCloseCreateClass.addEventListener('click', () => {
+            modalCreateClass.classList.add('hidden');
+        });
+    }
+
+    if (formCreateClass) {
+        formCreateClass.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const name = document.getElementById('teacher-class-name').value.trim();
+            const date = document.getElementById('teacher-class-date').value;
+            const hour = document.getElementById('teacher-class-hour').value;
+            const minute = document.getElementById('teacher-class-minute').value;
+            if (!name || !date || !hour || !minute) {
+                alert('Completa nombre, fecha y hora.');
+                return;
+            }
+
+            dbRef.collection("clases").add({
+                nombre: name,
+                fecha: date,
+                hora: `${hour}:${minute}`,
+                profesor: currentProfessorName || 'Profesor',
+                ejercicios: [],
+                alumnosInscritos: [],
+                alumnosAsistieron: [],
+                asistenciaGrabada: false,
+                creadaPor: 'profesor'
+            }).then(() => {
+                formCreateClass.reset();
+                modalCreateClass.classList.add('hidden');
+                alert('Clase creada correctamente.');
+            }).catch(err => alert('Error al crear clase: ' + err));
+        });
+    }
 
     // ==========================================
     // RENDERIZADO DEL PORTAL (DASHBOARD)
