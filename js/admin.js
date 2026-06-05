@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
         alumnos: [],
         ingresos: [],
         clases: [],
-        configuracion: { horasLimite: 2 }
+        configuracion: { horasLimite: 2, invitaciones: [] }
     };
 
     // Variables de Estado del Balance General
@@ -118,6 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (inputHoras) inputHoras.value = db.configuracion.horasLimite || 2;
                 if (inputWhatsapp) inputWhatsapp.value = db.configuracion.whatsapp || '';
             }
+            renderInvitaciones();
             renderAdminDashboard();
         });
     };
@@ -480,18 +481,38 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Funciones de comprobantes de alumnos
+    const voucherHistorialActualizado = (al, estado) => {
+        const historial = Array.isArray(al.voucherHistorial) ? al.voucherHistorial : [];
+        const voucher = al.voucherPendiente || {};
+        return [
+            {
+                planId: voucher.planId || null,
+                planNombre: voucher.planNombre || 'Plan',
+                monto: parseInt(voucher.monto || 0),
+                creditos: parseInt(voucher.creditos || 0),
+                duracion: parseInt(voucher.duracion || 30),
+                imagen: voucher.imagen || voucher.foto || null,
+                foto: voucher.foto || voucher.imagen || null,
+                fecha: voucher.fecha || new Date().toISOString(),
+                estado
+            },
+            ...historial
+        ].slice(0, 3);
+    };
+
     window.reviewVoucher = (alumnoId) => {
         const al = db.alumnos.find(a => a.id === alumnoId);
         if (!al || !al.voucherPendiente) return;
 
-        let planOptions = db.suscripciones.map(s => `<option value="${s.id}">${s.nombre} ($${Number(s.valor).toLocaleString('es-CL')})</option>`).join('');
+        let planOptions = db.suscripciones.map(s => `<option value="${s.id}" ${al.voucherPendiente.planId === s.id ? 'selected' : ''}>${s.nombre} ($${Number(s.valor).toLocaleString('es-CL')})</option>`).join('');
 
         openModal('Aprobar Comprobante de Pago', `
             <div style="text-align:center;">
-                <p style="font-size:13px; color:var(--text-muted); margin-bottom:15px;">Comprobante enviado por <strong>${al.nombre}</strong> el ${new Date(al.voucherPendiente.fecha).toLocaleString('es-ES')}</p>
+                <p style="font-size:13px; color:var(--text-muted); margin-bottom:8px;">Comprobante enviado por <strong>${al.nombre}</strong> el ${new Date(al.voucherPendiente.fecha).toLocaleString('es-ES')}</p>
+                <p style="font-size:13px; color:var(--text-main); margin-bottom:15px;">Plan solicitado: <strong>${al.voucherPendiente.planNombre || 'Sin plan seleccionado'}</strong> · $${Number(al.voucherPendiente.monto || 0).toLocaleString('es-CL')}</p>
                 
                 <div style="max-width:100%; max-height:300px; border-radius:12px; margin-bottom:20px; border:1px solid #e2e8f0; display:flex; justify-content:center; align-items:center; background:#f8fafc; overflow:hidden;">
-                    <img src="${al.voucherPendiente.foto}" style="max-width:100%; max-height:300px; object-fit:contain; cursor:zoom-in;" onclick="window.open('${al.voucherPendiente.foto}', '_blank')" title="Click para ver en grande">
+                    <img src="${al.voucherPendiente.imagen || al.voucherPendiente.foto}" style="max-width:100%; max-height:300px; object-fit:contain; cursor:zoom-in;" onclick="window.open('${al.voucherPendiente.imagen || al.voucherPendiente.foto}', '_blank')" title="Click para ver en grande">
                 </div>
 
                 <form id="form-aprobar-voucher">
@@ -520,6 +541,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 </form>
             </div>
         `);
+
+        if (al.voucherPendiente.planId) {
+            const plan = db.suscripciones.find(s => s.id === al.voucherPendiente.planId);
+            if (plan) {
+                document.getElementById('ap-creditos').value = plan.dias || al.voucherPendiente.creditos || 0;
+                document.getElementById('ap-info-caducidad').innerHTML = `<strong>Plan preseleccionado:</strong> ${plan.nombre}`;
+            }
+        }
 
         // Auto-completar al elegir plan en voucher
         document.getElementById('ap-sub').addEventListener('change', (e) => {
@@ -572,6 +601,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         creditos: creditosNuevos,
                         duracion: planSeleccionado.duracion || 30
                     },
+                    voucherHistorial: voucherHistorialActualizado(al, 'aprobado'),
                     voucherPendiente: null
                 });
             } else {
@@ -585,6 +615,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     creditos: creditosNuevos,
                     planId: planSeleccionado.id,
                     planNombre: planSeleccionado.nombre,
+                    voucherHistorial: voucherHistorialActualizado(al, 'aprobado'),
                     voucherPendiente: null,
                     proximoPlan: null // Limpiar por si acaso
                 });
@@ -623,8 +654,10 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     window.rejectVoucher = (alumnoId) => {
+        const al = db.alumnos.find(a => a.id === alumnoId);
         if (confirm("¿Seguro que deseas rechazar este comprobante? Se eliminará la solicitud de revisión.")) {
             dbRef.collection("alumnos").doc(alumnoId).update({
+                voucherHistorial: al ? voucherHistorialActualizado(al, 'rechazado') : [],
                 voucherPendiente: null
             }).then(() => {
                 modal.classList.add('hidden');
@@ -867,7 +900,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     // MÓDULO: INGRESOS (FINANZAS)
     // ==========================================
-    let ingresosFilter = 'todos'; // 'todos', 'pagados', 'pendientes'
+    let ingresosFilter = 'todos'; // 'todos', 'pagados', 'pendientes', 'validar'
     
     const renderIngresos = () => {
         const container = document.getElementById('ingresos-list');
@@ -880,6 +913,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <button class="btn-primary btn-sm" id="btn-filt-todos" style="flex:1; margin:0; background:${ingresosFilter==='todos'?'#3b82f6':'#f1f5f9'}; color:${ingresosFilter==='todos'?'white':'#475569'};">Todos</button>
             <button class="btn-primary btn-sm" id="btn-filt-pagados" style="flex:1; margin:0; background:${ingresosFilter==='pagados'?'var(--success-color)':'#f1f5f9'}; color:${ingresosFilter==='pagados'?'white':'#475569'};">Pagados</button>
             <button class="btn-primary btn-sm" id="btn-filt-pendientes" style="flex:1; margin:0; background:${ingresosFilter==='pendientes'?'#f59e0b':'#f1f5f9'}; color:${ingresosFilter==='pendientes'?'white':'#475569'};">Pendientes</button>
+            <button class="btn-primary btn-sm" id="btn-filt-validar" style="flex:1; margin:0; background:${ingresosFilter==='validar'?'#f59e0b':'#f1f5f9'}; color:${ingresosFilter==='validar'?'white':'#475569'};">Por validar</button>
         `;
         container.appendChild(filterControls);
         
@@ -888,6 +922,29 @@ document.addEventListener('DOMContentLoaded', () => {
         filterControls.querySelector('#btn-filt-todos').onclick = () => setFilter('todos');
         filterControls.querySelector('#btn-filt-pagados').onclick = () => setFilter('pagados');
         filterControls.querySelector('#btn-filt-pendientes').onclick = () => setFilter('pendientes');
+        filterControls.querySelector('#btn-filt-validar').onclick = () => setFilter('validar');
+
+        if (ingresosFilter === 'validar') {
+            const vouchersPendientes = db.alumnos.filter(al => al.voucherPendiente);
+            if (vouchersPendientes.length === 0) {
+                container.insertAdjacentHTML('beforeend', '<p style="color:var(--text-muted); font-size:14px; width:100%; text-align:center; padding:20px; grid-column: 1 / -1;">No hay pagos por validar.</p>');
+                return;
+            }
+
+            vouchersPendientes.forEach(al => {
+                const voucher = al.voucherPendiente;
+                container.insertAdjacentHTML('beforeend', `
+                    <div class="data-card" style="min-width: 280px; border-left: 4px solid #f59e0b;">
+                        <span class="badge" style="background:rgba(245,158,11,0.1); color:#d97706; margin:0;"><i class="fa-solid fa-clock"></i> Por validar</span>
+                        <h4 style="margin-top:15px; margin-bottom:5px;">${al.nombre}</h4>
+                        <p style="font-size:13px; margin-bottom:8px;">Plan: <strong>${voucher.planNombre || 'Sin plan'}</strong></p>
+                        <p style="font-size:13px; margin-bottom:12px;">Monto: <strong>$${Number(voucher.monto || 0).toLocaleString('es-CL')}</strong></p>
+                        <button class="btn-primary btn-sm" onclick="reviewVoucher('${al.id}')" style="width:100%; background:#f59e0b; margin-top:8px;"><i class="fa-solid fa-file-invoice-dollar"></i> Revisar voucher</button>
+                    </div>
+                `);
+            });
+            return;
+        }
 
         let dataToShow = db.ingresos.filter(ing => {
             const estado = ing.estado || 'pagado'; // Compatibilidad antigua
@@ -942,10 +999,10 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        let alumnosOptions = db.alumnos.map(a => `<option value="${a.id}|${a.nombre}">${a.nombre}</option>`).join('');
-        let subsOptions = db.suscripciones.map(s => `<option value="${s.nombre}|${s.valor}">${s.nombre} ($${Number(s.valor).toLocaleString('es-CL')})</option>`).join('');
+        let alumnosOptions = db.alumnos.map(a => `<option value="${a.id}">${a.nombre}</option>`).join('');
+        let subsOptions = db.suscripciones.map(s => `<option value="${s.id}">${s.nombre}</option>`).join('');
 
-        openModal('Registrar Ingreso (Manual)', `
+        openModal('Registrar Pago', `
             <form id="form-ingreso">
                 <div class="input-group">
                     <i class="fa-solid fa-user"></i>
@@ -961,31 +1018,114 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${subsOptions}
                     </select>
                 </div>
+                <div id="ing-plan-summary" style="background:var(--bg-color); border:1px solid rgba(0,0,0,0.06); border-radius:14px; padding:14px; margin-bottom:15px; display:none;">
+                    <div style="display:flex; justify-content:space-between; gap:12px; font-size:13px; color:var(--text-main);">
+                        <span><i class="fa-solid fa-bolt" style="color:#f59e0b; margin-right:5px;"></i> Clases: <strong id="ing-plan-clases">0</strong></span>
+                        <span><i class="fa-solid fa-dollar-sign" style="color:var(--success-color); margin-right:5px;"></i> Monto: <strong id="ing-plan-monto">$0</strong></span>
+                    </div>
+                    <p id="ing-plan-vigencia" style="font-size:11px; color:var(--text-muted); text-align:center; margin:10px 0 0 0;">La vigencia se calculara desde el estado actual del alumno.</p>
+                </div>
                 <div class="input-group">
                     <i class="fa-solid fa-calendar-day" style="z-index:2;"></i>
                     <input type="date" id="ing-fecha" required title="Fecha de Pago">
                 </div>
-                <p style="font-size:11px; color:var(--text-muted); text-align:center;">Nota: Los pagos manuales quedan marcados como "Pagados".</p>
+                <p style="font-size:11px; color:var(--text-muted); text-align:center;">El monto y las clases se cargan automaticamente desde Servicios.</p>
                 <button type="submit" class="btn-primary btn-sm" style="width:100%; margin-top:10px;">Guardar Pago</button>
             </form>
         `);
         
         document.getElementById('ing-fecha').valueAsDate = new Date();
 
+        const updateIngresoPlanSummary = () => {
+            const plan = db.suscripciones.find(s => s.id === document.getElementById('ing-sub').value);
+            const alumno = db.alumnos.find(a => a.id === document.getElementById('ing-alumno').value);
+            const summary = document.getElementById('ing-plan-summary');
+
+            if (!plan) {
+                summary.style.display = 'none';
+                return;
+            }
+
+            summary.style.display = 'block';
+            document.getElementById('ing-plan-clases').innerText = plan.dias || 0;
+            document.getElementById('ing-plan-monto').innerText = '$' + Number(plan.valor || 0).toLocaleString('es-CL');
+
+            let message = `Vigencia: ${plan.duracion || 30} dias desde la fecha de pago.`;
+            if (alumno) {
+                const actualCaducidad = new Date(alumno.caducidad);
+                const tienePlanActivo = actualCaducidad >= new Date() && (alumno.creditos > 0);
+                if (tienePlanActivo) {
+                    message = 'El alumno tiene plan activo: este pago quedara como renovacion en espera.';
+                } else {
+                    const fechaInicio = new Date(document.getElementById('ing-fecha').value);
+                    const caducidad = new Date(fechaInicio);
+                    caducidad.setDate(caducidad.getDate() + (plan.duracion || 30));
+                    message = `Activacion inmediata. Valido hasta: ${caducidad.toLocaleDateString('es-ES')}.`;
+                }
+            }
+            document.getElementById('ing-plan-vigencia').innerText = message;
+        };
+
+        document.getElementById('ing-sub').addEventListener('change', updateIngresoPlanSummary);
+        document.getElementById('ing-alumno').addEventListener('change', updateIngresoPlanSummary);
+        document.getElementById('ing-fecha').addEventListener('change', updateIngresoPlanSummary);
+
         document.getElementById('form-ingreso').onsubmit = (e) => {
             e.preventDefault();
-            const alData = document.getElementById('ing-alumno').value.split('|');
-            const subData = document.getElementById('ing-sub').value.split('|');
+            const alumno = db.alumnos.find(a => a.id === document.getElementById('ing-alumno').value);
+            const planSeleccionado = db.suscripciones.find(s => s.id === document.getElementById('ing-sub').value);
+            if (!alumno || !planSeleccionado) {
+                alert("Debes seleccionar alumno y plan.");
+                return;
+            }
+
+            const actualCaducidad = new Date(alumno.caducidad);
+            const tienePlanActivo = actualCaducidad >= new Date() && (alumno.creditos > 0);
+            if (tienePlanActivo && alumno.proximoPlan) {
+                alert("El alumno ya tiene un plan en espera. Solo se permite 1 plan en cola.");
+                return;
+            }
+
+            const batch = firebase.firestore().batch();
+            const alumnoRef = dbRef.collection("alumnos").doc(alumno.id);
+            const ingresoRef = dbRef.collection("ingresos").doc();
+            const creditosNuevos = parseInt(planSeleccionado.dias || 0);
+            const fechaPago = document.getElementById('ing-fecha').value;
+
+            if (tienePlanActivo) {
+                batch.update(alumnoRef, {
+                    proximoPlan: {
+                        planId: planSeleccionado.id,
+                        planNombre: planSeleccionado.nombre,
+                        creditos: creditosNuevos,
+                        duracion: planSeleccionado.duracion || 30
+                    }
+                });
+            } else {
+                const fechaInicio = new Date(fechaPago);
+                const nuevaCaducidad = new Date(fechaInicio);
+                nuevaCaducidad.setDate(nuevaCaducidad.getDate() + (planSeleccionado.duracion || 30));
+                batch.update(alumnoRef, {
+                    caducidad: nuevaCaducidad.toISOString(),
+                    creditos: creditosNuevos,
+                    planId: planSeleccionado.id,
+                    planNombre: planSeleccionado.nombre,
+                    proximoPlan: null
+                });
+            }
             
-            dbRef.collection("ingresos").add({
-                alumnoNombre: alData[1],
-                alumnoId: alData[0],
-                suscripcion: subData[0],
-                monto: parseInt(subData[1]),
-                fecha: document.getElementById('ing-fecha').value,
+            batch.set(ingresoRef, {
+                alumnoNombre: alumno.nombre,
+                alumnoId: alumno.id,
+                suscripcion: planSeleccionado.nombre,
+                monto: parseInt(planSeleccionado.valor || 0),
+                fecha: fechaPago,
                 estado: 'pagado'
-            }).then(() => {
+            });
+
+            batch.commit().then(() => {
                 modal.classList.add('hidden');
+                alert(tienePlanActivo ? "Pago registrado. La renovacion quedo en espera." : "Pago registrado y plan activado.");
             }).catch(err => alert("Error al guardar pago: " + err));
         };
     });
@@ -1912,6 +2052,134 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     };
 
+    const normalizarInvitaciones = () => {
+        const invitaciones = Array.isArray(db.configuracion.invitaciones) ? db.configuracion.invitaciones : [];
+        return invitaciones
+            .filter(inv => inv && inv.correo)
+            .map(inv => ({
+                correo: String(inv.correo).trim().toLowerCase(),
+                usado: inv.usado === true,
+                creadoEn: inv.creadoEn || null,
+                usadoEn: inv.usadoEn || null,
+                alumnoId: inv.alumnoId || null
+            }))
+            .sort((a, b) => {
+                if (a.usado !== b.usado) return a.usado ? 1 : -1;
+                return a.correo.localeCompare(b.correo);
+            });
+    };
+
+    const renderInvitaciones = () => {
+        const container = document.getElementById('invitaciones-list');
+        if (!container) return;
+
+        const invitaciones = normalizarInvitaciones();
+        container.innerHTML = '';
+
+        const disponibles = invitaciones.filter(inv => !inv.usado).length;
+        const usadas = invitaciones.length - disponibles;
+
+        container.innerHTML += `
+            <div class="data-card" style="min-width:220px;">
+                <span class="badge" style="background:#dcfce7; color:#15803d;">Disponibles</span>
+                <h4>${disponibles}</h4>
+                <p>Correos que aun pueden crear una cuenta.</p>
+            </div>
+            <div class="data-card" style="min-width:220px;">
+                <span class="badge" style="background:#e2e8f0; color:#475569;">Usadas</span>
+                <h4>${usadas}</h4>
+                <p>Invitaciones que ya crearon perfil de alumno.</p>
+            </div>
+        `;
+
+        if (invitaciones.length === 0) {
+            container.innerHTML += '<p style="color:var(--text-muted); font-size:14px; width:100%;">No hay invitaciones creadas.</p>';
+            return;
+        }
+
+        invitaciones.forEach((inv, idx) => {
+            container.innerHTML += `
+                <div class="data-card">
+                    <span class="badge" style="background:${inv.usado ? '#e2e8f0' : '#dcfce7'}; color:${inv.usado ? '#475569' : '#15803d'};">${inv.usado ? 'Usada' : 'Disponible'}</span>
+                    <h4>${inv.correo}</h4>
+                    <p>${inv.usado ? `Cuenta creada${inv.usadoEn ? ` el ${inv.usadoEn}` : ''}` : `Autorizado desde ${inv.creadoEn || 'hoy'}`}</p>
+                    ${inv.usado ? '' : `
+                        <div class="card-actions">
+                            <button class="btn-icon delete" onclick="deleteInvitacion(${idx})" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    `}
+                </div>
+            `;
+        });
+    };
+
+    const fechaKey = (date) => {
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${date.getFullYear()}-${month}-${day}`;
+    };
+
+    const guardarInvitaciones = (invitaciones) => {
+        return dbRef.collection("configuracion").doc("global").set({
+            invitaciones
+        }, { merge: true });
+    };
+
+    document.getElementById('btn-add-invitacion')?.addEventListener('click', () => {
+        openModal('Autorizar Alumno', `
+            <form id="form-invitacion" autocomplete="off">
+                <p style="font-size:13px; color:var(--text-muted); margin:0 0 15px 0;">Solo este correo podra crear una cuenta de alumno. Cada invitacion se usa una sola vez.</p>
+                <div class="input-group"><i class="fa-regular fa-envelope"></i><input type="email" id="inv-correo" placeholder="Correo autorizado" required></div>
+                <button type="submit" class="btn-primary btn-sm" style="width:100%; margin-top:10px;">Guardar Invitacion</button>
+            </form>
+        `);
+
+        document.getElementById('form-invitacion').onsubmit = (e) => {
+            e.preventDefault();
+            const correo = document.getElementById('inv-correo').value.trim().toLowerCase();
+            const emailOk = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(correo);
+            if (!emailOk) {
+                alert('Ingresa un correo valido.');
+                return;
+            }
+
+            const invitaciones = normalizarInvitaciones();
+            if (invitaciones.some(inv => inv.correo === correo)) {
+                alert('Este correo ya tiene una invitacion.');
+                return;
+            }
+
+            if (db.alumnos.some(al => al.correo && al.correo.trim().toLowerCase() === correo)) {
+                alert('Este correo ya existe como alumno.');
+                return;
+            }
+
+            guardarInvitaciones([
+                ...invitaciones,
+                {
+                    correo,
+                    usado: false,
+                    creadoEn: fechaKey(new Date()),
+                    usadoEn: null,
+                    alumnoId: null
+                }
+            ]).then(() => {
+                modal.classList.add('hidden');
+            }).catch(err => alert("Error al guardar invitacion: " + err));
+        };
+    });
+
+    window.deleteInvitacion = (idx) => {
+        const invitaciones = normalizarInvitaciones();
+        const inv = invitaciones[idx];
+        if (!inv || inv.usado) return;
+
+        if (confirm(`Quitar autorizacion para ${inv.correo}?`)) {
+            guardarInvitaciones(invitaciones.filter((_, i) => i !== idx))
+                .catch(err => alert("Error al eliminar invitacion: " + err));
+        }
+    };
+
     const inputHoras = document.getElementById('horas-limite');
     const inputWhatsapp = document.getElementById('config-whatsapp');
     
@@ -1925,7 +2193,7 @@ document.addEventListener('DOMContentLoaded', () => {
             dbRef.collection("configuracion").doc("global").set({
                 horasLimite: val,
                 whatsapp: waVal
-            }).then(() => {
+            }, { merge: true }).then(() => {
                 const btn = document.getElementById('btn-save-config');
                 const originalText = btn.innerText;
                 btn.innerHTML = '<i class="fa-solid fa-check"></i> Guardado';

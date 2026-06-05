@@ -100,6 +100,33 @@
                     
                     <button type="submit" class="btn-primary">Ingresar al Portal</button>
                 </form>
+
+                <form id="register-form" class="hidden">
+                    <div class="input-group">
+                        <i class="fa-regular fa-user"></i>
+                        <input type="text" id="reg-nombre" placeholder="Nombre completo" autocomplete="off">
+                    </div>
+
+                    <div class="input-group">
+                        <i class="fa-solid fa-phone"></i>
+                        <input type="text" id="reg-telefono" placeholder="Telefono" autocomplete="off">
+                    </div>
+
+                    <div class="input-group">
+                        <i class="fa-regular fa-envelope"></i>
+                        <input type="email" id="reg-correo" placeholder="Correo autorizado" autocomplete="off">
+                    </div>
+
+                    <div class="input-group">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="reg-password" placeholder="Clave de 7 a 8 caracteres" maxlength="8">
+                    </div>
+
+                    <button type="submit" class="btn-primary">Crear mi Cuenta</button>
+                    <p class="register-note">La cuenta queda sin plan hasta registrar el pago.</p>
+                </form>
+
+                <button type="button" id="btn-toggle-register" class="btn-register-toggle">Crear cuenta con invitacion</button>
                 
                 <div id="login-error" class="error-message hidden">
                     <i class="fa-solid fa-circle-exclamation"></i> Credenciales incorrectas

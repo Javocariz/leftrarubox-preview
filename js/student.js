@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
         clases: [],
         alumnos: [],
         ejercicios: [],
+        suscripciones: [],
         configuracion: { horasLimite: 2 }
     };
 
@@ -21,11 +22,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Configurar escuchadores en tiempo real
     const setupRealtimeListeners = () => {
-        let loadedCollections = { alumnos: false, clases: false, ejercicios: false, configuracion: false };
+        let loadedCollections = { alumnos: false, clases: false, ejercicios: false, suscripciones: false, configuracion: false };
 
         const checkInitialRender = (collectionName) => {
             loadedCollections[collectionName] = true;
-            if (loadedCollections.alumnos && loadedCollections.clases && loadedCollections.ejercicios && loadedCollections.configuracion) {
+            if (loadedCollections.alumnos && loadedCollections.clases && loadedCollections.ejercicios && loadedCollections.suscripciones && loadedCollections.configuracion) {
                 currentUserIndex = db.alumnos.findIndex(a => a.correo && a.correo.trim().toLowerCase() === currentUserEmail.trim().toLowerCase());
                 if (currentUserIndex === -1) {
                     window.location.href = 'index.html';
@@ -64,6 +65,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderModales();
             }
             checkInitialRender("ejercicios");
+        });
+
+        dbRef.collection("suscripciones").onSnapshot(snap => {
+            db.suscripciones = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            if (currentUserIndex !== -1) {
+                renderDashboard();
+                renderModales();
+            }
+            checkInitialRender("suscripciones");
         });
 
         dbRef.collection("configuracion").doc("global").onSnapshot(doc => {
@@ -105,6 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
         modalReservar.classList.add('hidden');
         modalHistorial.classList.add('hidden');
         modalProfile.classList.add('hidden');
+        modalVoucher.classList.add('hidden');
     });
 
     // BOTÓN RESERVAR (Centro)
@@ -119,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // BOTÓN NOTIFICACIONES (CABECERA Y BOTTOM PILL)
     const openBellNotification = () => {
-        openVoucherUpload();
+        alert("No tienes notificaciones nuevas.");
     };
     
     const btnBellHeader = document.getElementById('btn-bell-notifications');
@@ -132,6 +143,17 @@ document.addEventListener('DOMContentLoaded', () => {
         btnBellPill.addEventListener('click', () => {
             updateNavActive('btn-nav-notifications');
             openBellNotification();
+        });
+    }
+
+    const btnPaymentsPill = document.getElementById('btn-nav-payments');
+    if (btnPaymentsPill) {
+        btnPaymentsPill.addEventListener('click', () => {
+            updateNavActive('btn-nav-payments');
+            modalReservar.classList.add('hidden');
+            modalHistorial.classList.add('hidden');
+            modalProfile.classList.add('hidden');
+            openVoucherUpload();
         });
     }
 
@@ -737,7 +759,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnCloseVoucher = document.getElementById('btn-close-voucher');
     
     if (btnCloseVoucher) {
-        btnCloseVoucher.onclick = () => modalVoucher.classList.add('hidden');
+        btnCloseVoucher.onclick = () => {
+            modalVoucher.classList.add('hidden');
+            updateNavActive('btn-nav-home');
+        };
     }
 
     window.copyToClipboard = (text, btn) => {
@@ -776,10 +801,44 @@ document.addEventListener('DOMContentLoaded', () => {
         renderVoucherStatus();
     };
 
+    const getVoucherHistoryHtml = () => {
+        const historial = Array.isArray(currentUser.voucherHistorial)
+            ? currentUser.voucherHistorial.filter(item => item.estado === 'aprobado').slice(0, 3)
+            : [];
+        if (historial.length === 0) {
+            return '<p style="font-size:12px; color:#94a3b8; margin:18px 0 0 0;">Aun no tienes vouchers activados registrados.</p>';
+        }
+
+        return `
+            <div style="width:100%; margin-top:20px; text-align:left;">
+                <h4 style="font-size:13px; color:#1e293b; margin:0 0 10px 0; font-weight:900;">Ultimos vouchers activados</h4>
+                ${historial.map(item => `
+                    <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:10px; margin-bottom:8px; display:flex; justify-content:space-between; gap:12px; align-items:center;">
+                        <div>
+                            <strong style="display:block; font-size:12px; color:#1e293b;">${item.planNombre || 'Plan'}</strong>
+                            <span style="font-size:11px; color:#64748b;">${item.fecha ? new Date(item.fecha).toLocaleDateString('es-ES') : 'Sin fecha'} · ${item.estado || 'pendiente'}</span>
+                        </div>
+                        ${item.imagen || item.foto ? `<button onclick="window.open('${item.imagen || item.foto}', '_blank')" style="border:none; background:#e0f2fe; color:#0369a1; border-radius:8px; padding:7px 9px; cursor:pointer;"><i class="fa-regular fa-image"></i></button>` : ''}
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    };
+
+    const getPlanOptionsHtml = () => {
+        if (!db.suscripciones.length) {
+            return '<option value="">No hay planes disponibles</option>';
+        }
+        return '<option value="">Selecciona el plan que estas pagando</option>' + db.suscripciones.map(plan => {
+            return `<option value="${plan.id}">${plan.nombre} - $${Number(plan.valor || 0).toLocaleString('es-CL')}</option>`;
+        }).join('');
+    };
+
     const renderVoucherStatus = () => {
         currentUser = db.alumnos[currentUserIndex];
         
         if (currentUser.voucherPendiente) {
+            const voucher = currentUser.voucherPendiente;
             voucherStatusContent.innerHTML = `
                 <div style="text-align:center; width:100%;">
                     <div style="width:60px; height:60px; border-radius:50%; background:rgba(96,165,250,0.15); color:#60a5fa; display:flex; justify-content:center; align-items:center; font-size:28px; margin:20px auto 15px;">
@@ -788,11 +847,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     <h3 style="font-weight:800; font-size:18px; margin:0 0 10px 0; color:#1e293b;">Pago en Revisión</h3>
                     <p style="font-size:13px; color:#475569; margin:0 0 25px 0; line-height:1.5; padding:0 20px;">Ya hemos recibido tu comprobante enviado el <strong>${new Date(currentUser.voucherPendiente.fecha).toLocaleString('es-ES')}</strong>. El administrador validará la información pronto y activará tu cuenta automáticamente.</p>
                     
-                    <div class="voucher-img-container">
-                        <img src="${currentUser.voucherPendiente.foto}">
+                    <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:12px; margin:0 0 18px 0; text-align:left;">
+                        <p style="margin:0 0 6px 0; font-size:12px; color:#475569;">Plan solicitado: <strong style="color:#1e293b;">${voucher.planNombre || 'Sin plan seleccionado'}</strong></p>
+                        <p style="margin:0 0 6px 0; font-size:12px; color:#475569;">Monto: <strong style="color:#1e293b;">$${Number(voucher.monto || 0).toLocaleString('es-CL')}</strong></p>
+                        <p style="margin:0; font-size:12px; color:#475569;">El administrador tiene este voucher pendiente de validacion.</p>
                     </div>
-                    
-                    <button onclick="cancelVoucherSubmission()" class="btn-primary" style="background:#ef4444; width:100%; margin-top:10px; border:none; padding:12px; border-radius:12px; font-weight:800; font-size:14px; cursor:pointer; color:white; box-shadow:0 4px 15px rgba(239, 68, 68, 0.2);"><i class="fa-solid fa-trash-can" style="margin-right:8px;"></i> Eliminar y Subir Otro</button>
+
+                    <div class="voucher-img-container">
+                        <img src="${voucher.imagen || voucher.foto}">
+                    </div>
+                    ${getVoucherHistoryHtml()}
                 </div>
             `;
         } else {
@@ -839,6 +903,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     
                     <form id="form-upload-voucher" style="width:100%; box-sizing:border-box; padding:0 5px;">
+                        <div class="input-group" style="margin-bottom:15px;">
+                            <i class="fa-solid fa-ticket"></i>
+                            <select id="voucher-plan-select" required>
+                                ${getPlanOptionsHtml()}
+                            </select>
+                        </div>
                         <div class="voucher-dropzone">
                             <i class="fa-solid fa-cloud-arrow-up"></i>
                             <span id="file-label-text">📥 Haz clic aquí para adjuntar tu voucher</span>
@@ -854,6 +924,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <i class="fa-solid fa-paper-plane"></i> Enviar a Revisión
                         </button>
                     </form>
+                    ${getVoucherHistoryHtml()}
                 </div>
             `;
             
@@ -882,7 +953,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 form.onsubmit = (e) => {
                     e.preventDefault();
                     const file = fileInput.files[0];
+                    const plan = db.suscripciones.find(item => item.id === document.getElementById('voucher-plan-select').value);
                     if (!file) return;
+                    if (!plan) {
+                        alert("Selecciona el plan que estas pagando.");
+                        return;
+                    }
                     
                     const submitBtn = document.getElementById('btn-submit-voucher');
                     submitBtn.disabled = true;
@@ -922,7 +998,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             dbRef.collection("alumnos").doc(currentUser.id).update({
                                 voucherPendiente: {
                                     foto: compressedDataUrl,
-                                    fecha: new Date().toISOString()
+                                    imagen: compressedDataUrl,
+                                    fecha: new Date().toISOString(),
+                                    estado: 'pendiente',
+                                    planId: plan.id,
+                                    planNombre: plan.nombre,
+                                    monto: parseInt(plan.valor || 0),
+                                    creditos: parseInt(plan.dias || 0),
+                                    duracion: parseInt(plan.duracion || 30)
                                 }
                             }).then(() => {
                                 alert("¡Comprobante enviado con éxito! Tu pago está en revisión.");
@@ -1007,6 +1090,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
 
                     <form id="form-upload-voucher-blocked" style="width:100%;">
+                        <div class="input-group" style="margin-bottom:12px;">
+                            <i class="fa-solid fa-ticket"></i>
+                            <select id="block-voucher-plan-select" required>
+                                ${getPlanOptionsHtml()}
+                            </select>
+                        </div>
                         <div class="voucher-dropzone" style="padding:15px; gap:8px; border-radius:12px; margin-bottom:15px;">
                             <i class="fa-solid fa-cloud-arrow-up" style="font-size:24px;"></i>
                             <span id="block-file-label-text" style="font-size:12px;">📥 Haz clic aquí para adjuntar tu voucher</span>
@@ -1049,7 +1138,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 form.onsubmit = (e) => {
                     e.preventDefault();
                     const file = fileInput.files[0];
+                    const plan = db.suscripciones.find(item => item.id === document.getElementById('block-voucher-plan-select').value);
                     if (!file) return;
+                    if (!plan) {
+                        alert("Selecciona el plan que estas pagando.");
+                        return;
+                    }
                     
                     const submitBtn = document.getElementById('btn-submit-voucher-blocked');
                     submitBtn.disabled = true;
@@ -1089,7 +1183,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             dbRef.collection("alumnos").doc(currentUser.id).update({
                                 voucherPendiente: {
                                     foto: compressedDataUrl,
-                                    fecha: new Date().toISOString()
+                                    imagen: compressedDataUrl,
+                                    fecha: new Date().toISOString(),
+                                    estado: 'pendiente',
+                                    planId: plan.id,
+                                    planNombre: plan.nombre,
+                                    monto: parseInt(plan.valor || 0),
+                                    creditos: parseInt(plan.dias || 0),
+                                    duracion: parseInt(plan.duracion || 30)
                                 }
                             }).then(() => {
                                 alert("¡Comprobante enviado con éxito! Tu pago está en revisión y el acceso se reactivará al ser aprobado.");

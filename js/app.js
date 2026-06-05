@@ -1,8 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const toggleRegisterBtn = document.getElementById('btn-toggle-register');
     const usernameInput = document.getElementById('username');
     const passwordInput = document.getElementById('password');
     const errorMsg = document.getElementById('login-error');
+    let isRegisterMode = false;
 
     // --- MIGRACIÓN AUTOMÁTICA DE LOCALSTORAGE A FIRESTORE ---
     let localDB = localStorage.getItem('leftrarubox_db');
@@ -122,16 +125,142 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function mostrarError() {
+    if (toggleRegisterBtn && registerForm && loginForm) {
+        toggleRegisterBtn.addEventListener('click', () => {
+            isRegisterMode = !isRegisterMode;
+            loginForm.classList.toggle('hidden', isRegisterMode);
+            registerForm.classList.toggle('hidden', !isRegisterMode);
+            toggleRegisterBtn.innerText = isRegisterMode ? 'Ya tengo cuenta' : 'Crear cuenta con invitacion';
+            if (errorMsg) errorMsg.classList.add('hidden');
+        });
+    }
+
+    if (registerForm) {
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nombre = document.getElementById('reg-nombre').value.trim();
+            const telefono = document.getElementById('reg-telefono').value.trim();
+            const correo = document.getElementById('reg-correo').value.trim().toLowerCase();
+            const password = document.getElementById('reg-password').value.trim();
+
+            if (!nombre || !correo || !password) {
+                mostrarError('Completa nombre, correo y clave.');
+                return;
+            }
+
+            if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(correo)) {
+                mostrarError('Ingresa un correo valido.');
+                return;
+            }
+
+            if (password.length < 7 || password.length > 8) {
+                mostrarError('La clave debe tener 7 u 8 caracteres.');
+                return;
+            }
+
+            try {
+                const alumnoSnap = await dbRef.collection("alumnos")
+                    .where("correo", "==", correo)
+                    .limit(1)
+                    .get();
+
+                if (!alumnoSnap.empty) {
+                    mostrarError('Este correo ya tiene una cuenta.');
+                    return;
+                }
+
+                const configRef = dbRef.collection("configuracion").doc("global");
+                const configSnap = await configRef.get();
+                const invitaciones = normalizarInvitaciones(configSnap.exists ? configSnap.data() : {});
+                const invitacionIndex = invitaciones.findIndex(inv => inv.correo === correo && inv.usado !== true);
+
+                if (invitacionIndex === -1) {
+                    mostrarError('Este correo no esta autorizado por administracion.');
+                    return;
+                }
+
+                const alumnoRef = dbRef.collection("alumnos").doc();
+                const hoy = fechaKey(new Date());
+
+                await dbRef.runTransaction(async (transaction) => {
+                    const currentConfig = await transaction.get(configRef);
+                    const currentInvitaciones = normalizarInvitaciones(currentConfig.exists ? currentConfig.data() : {});
+                    const currentIndex = currentInvitaciones.findIndex(inv => inv.correo === correo && inv.usado !== true);
+
+                    if (currentIndex === -1) {
+                        throw new Error('La invitacion ya fue utilizada.');
+                    }
+
+                    currentInvitaciones[currentIndex] = {
+                        ...currentInvitaciones[currentIndex],
+                        correo,
+                        usado: true,
+                        usadoEn: hoy,
+                        alumnoId: alumnoRef.id
+                    };
+
+                    transaction.set(alumnoRef, {
+                        nombre,
+                        telefono,
+                        correo,
+                        password,
+                        foto: null,
+                        planNombre: 'Sin plan',
+                        creditos: 0,
+                        inscripcion: hoy,
+                        caducidad: null,
+                        invitacionId: invitacionId(correo)
+                    });
+
+                    transaction.set(configRef, { invitaciones: currentInvitaciones }, { merge: true });
+                });
+
+                sessionStorage.setItem('leftraru_role', 'alumno');
+                sessionStorage.setItem('leftraru_user', correo);
+                window.location.href = 'student_dashboard.html';
+            } catch (err) {
+                console.error("Error al crear cuenta: ", err);
+                mostrarError(err.message || 'No se pudo crear la cuenta.');
+            }
+        });
+    }
+
+    function mostrarError(mensaje = 'Credenciales incorrectas') {
         if (errorMsg) {
+            errorMsg.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ${mensaje}`;
             errorMsg.classList.remove('hidden');
-            passwordInput.value = '';
-            passwordInput.focus();
+            if (!isRegisterMode && passwordInput) {
+                passwordInput.value = '';
+                passwordInput.focus();
+            }
             
             setTimeout(() => {
                 errorMsg.classList.add('hidden');
             }, 3000);
         }
+    }
+
+    function normalizarInvitaciones(configuracion) {
+        const invitaciones = Array.isArray(configuracion.invitaciones) ? configuracion.invitaciones : [];
+        return invitaciones
+            .filter(inv => inv && inv.correo)
+            .map(inv => ({
+                correo: String(inv.correo).trim().toLowerCase(),
+                usado: inv.usado === true,
+                creadoEn: inv.creadoEn || null,
+                usadoEn: inv.usadoEn || null,
+                alumnoId: inv.alumnoId || null
+            }));
+    }
+
+    function fechaKey(date) {
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${date.getFullYear()}-${month}-${day}`;
+    }
+
+    function invitacionId(email) {
+        return email.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-');
     }
 
     // --- CARGAR NÚMERO DE WHATSAPP ---

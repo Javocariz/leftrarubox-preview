@@ -278,7 +278,7 @@
     left: 50%;
     transform: translateX(-50%);
     width: 90%;
-    max-width: 350px;
+    max-width: 410px;
     background: rgba(30, 41, 59, 0.85); /* Oscuro translúcido */
     border: 1px solid rgba(255,255,255,0.1);
     border-radius: 40px;
@@ -294,7 +294,7 @@
     border: none;
     color: rgba(255,255,255,0.5);
     font-size: 20px;
-    width: 45px;
+    width: 42px;
     height: 45px;
     border-radius: 50%;
     display: flex;

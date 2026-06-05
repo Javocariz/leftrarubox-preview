@@ -101,6 +101,24 @@ body {
     color: var(--text-muted);
 }
 
+.btn-register-toggle {
+    margin-top: 14px;
+    border: none;
+    background: transparent;
+    color: var(--success-color);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.register-note {
+    margin: 12px 0 0;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+
 /* Form Inputs */
 .input-group {
     position: relative;
