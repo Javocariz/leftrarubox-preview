@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css?v=1.0.1">
-    <link rel="stylesheet" href="css/trainer.css?v=1.0.2">
+    <link rel="stylesheet" href="css/trainer.css?v=1.0.3">
 </head>
 <body class="trainer-body">
 
@@ -125,20 +125,16 @@
                     <i class="fa-solid fa-calendar-day"></i>
                     <input type="date" id="teacher-class-date" required>
                 </div>
-                <div class="teacher-time-grid">
-                    <div class="teacher-class-field">
-                        <i class="fa-regular fa-clock"></i>
-                        <select id="teacher-class-hour" required></select>
-                    </div>
-                    <div class="teacher-class-field">
-                        <i class="fa-regular fa-clock"></i>
-                        <select id="teacher-class-minute" required>
-                            <option value="00">00</option>
-                            <option value="15">15</option>
-                            <option value="30">30</option>
-                            <option value="45">45</option>
-                        </select>
-                    </div>
+                <div class="teacher-time-pill" aria-label="Hora de la clase">
+                    <i class="fa-regular fa-clock"></i>
+                    <select id="teacher-class-hour" required></select>
+                    <span>:</span>
+                    <select id="teacher-class-minute" required>
+                        <option value="00">00</option>
+                        <option value="15">15</option>
+                        <option value="30">30</option>
+                        <option value="45">45</option>
+                    </select>
                 </div>
                 <button type="submit" class="teacher-submit-class">
                     <i class="fa-solid fa-calendar-plus"></i> Crear Clase
