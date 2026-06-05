@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css?v=1.0.1">
-    <link rel="stylesheet" href="css/trainer.css?v=1.0.1">
+    <link rel="stylesheet" href="css/trainer.css?v=1.0.2">
 </head>
 <body class="trainer-body">
 
@@ -116,22 +116,22 @@
                 </div>
                 <button class="btn-close-modal" id="btn-close-create-class" title="Cerrar"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <form id="form-create-class" class="vertical-scroll" style="gap:14px;">
-                <div class="input-group">
+            <form id="form-create-class" class="vertical-scroll teacher-class-form">
+                <div class="teacher-class-field">
                     <i class="fa-solid fa-dumbbell"></i>
                     <input type="text" id="teacher-class-name" placeholder="Nombre de la clase" required>
                 </div>
-                <div class="input-group">
+                <div class="teacher-class-field">
                     <i class="fa-solid fa-calendar-day"></i>
                     <input type="date" id="teacher-class-date" required>
                 </div>
-                <div style="display:flex; gap:12px;">
-                    <div class="input-group" style="flex:1;">
+                <div class="teacher-time-grid">
+                    <div class="teacher-class-field">
                         <i class="fa-regular fa-clock"></i>
                         <select id="teacher-class-hour" required></select>
                     </div>
-                    <div class="input-group" style="flex:1;">
-                        <i class="fa-solid fa-clock"></i>
+                    <div class="teacher-class-field">
+                        <i class="fa-regular fa-clock"></i>
                         <select id="teacher-class-minute" required>
                             <option value="00">00</option>
                             <option value="15">15</option>
@@ -140,7 +140,7 @@
                         </select>
                     </div>
                 </div>
-                <button type="submit" class="btn-primary" style="width:100%; border:none; padding:15px; border-radius:15px; font-weight:800; font-size:15px; background:var(--primary-gradient); cursor:pointer; display:flex; justify-content:center; align-items:center; gap:8px; color:white;">
+                <button type="submit" class="teacher-submit-class">
                     <i class="fa-solid fa-calendar-plus"></i> Crear Clase
                 </button>
             </form>
@@ -151,6 +151,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="js/firebase-config.js?v=1.0.1"></script>
-    <script src="js/trainer.js?v=1.0.2"></script>
+    <script src="js/trainer.js?v=1.0.3"></script>
 </body>
 </html>
