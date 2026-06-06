@@ -366,6 +366,41 @@ body {
     background: white;
 }
 
+.exercise-builder-row {
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+}
+
+.selected-exercises {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.exercise-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    border-radius: 999px;
+    background: #dcfce7;
+    color: #166534;
+    padding: 7px 10px 7px 12px;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.exercise-chip button {
+    border: none;
+    background: rgba(22, 101, 52, 0.12);
+    color: #166534;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
 /* --- RESPONSIVE MOBILE FIRST --- */
 @media (max-width: 768px) {
     .menu-grid {

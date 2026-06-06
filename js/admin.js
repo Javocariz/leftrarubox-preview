@@ -1564,6 +1564,67 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${hour}:${minute}`;
     };
 
+    const normalizeExerciseName = (name) => String(name || '').trim().toLowerCase().replace(/\s+/g, ' ');
+    const findExerciseByName = (name) => db.ejercicios.find(e => normalizeExerciseName(e.nombre) === normalizeExerciseName(name));
+    const ensureExerciseInBank = async (name, createdBy = 'admin') => {
+        const cleanName = String(name || '').trim().replace(/\s+/g, ' ');
+        if (!cleanName) return null;
+        const existing = findExerciseByName(cleanName);
+        if (existing) return existing;
+        const doc = await dbRef.collection("ejercicios").add({
+            nombre: cleanName,
+            creadoPor: createdBy,
+            creadoEn: new Date().toISOString()
+        });
+        return { id: doc.id, nombre: cleanName, creadoPor: createdBy };
+    };
+    const exerciseBuilderHtml = (selected = []) => `
+        <div class="exercise-builder" data-selected='${JSON.stringify(selected.map(e => ({ nombre: e.nombre || e }))).replace(/'/g, '&apos;')}'>
+            <div class="exercise-builder-row">
+                <div class="input-group" style="flex:1; margin:0;">
+                    <i class="fa-solid fa-person-running"></i>
+                    <input type="text" id="class-exercise-input" list="exercise-bank-suggestions" placeholder="Escribe un ejercicio (ej. Push Ups)">
+                    <datalist id="exercise-bank-suggestions">
+                        ${db.ejercicios.map(e => `<option value="${e.nombre}"></option>`).join('')}
+                    </datalist>
+                </div>
+                <button type="button" class="btn-primary btn-sm" id="btn-add-class-exercise" style="width:auto; margin:0; padding:0 14px;">Agregar</button>
+            </div>
+            <div id="selected-class-exercises" class="selected-exercises"></div>
+        </div>
+    `;
+    const setupExerciseBuilder = () => {
+        const root = document.querySelector('.exercise-builder');
+        if (!root) return;
+        let selected = [];
+        try { selected = JSON.parse(root.dataset.selected || '[]'); } catch (_) { selected = []; }
+        const input = document.getElementById('class-exercise-input');
+        const list = document.getElementById('selected-class-exercises');
+        const render = () => {
+            root.dataset.selected = JSON.stringify(selected);
+            list.innerHTML = selected.length ? selected.map((item, idx) => `
+                <span class="exercise-chip">${item.nombre}<button type="button" onclick="removeClassExercise(${idx})"><i class="fa-solid fa-xmark"></i></button></span>
+            `).join('') : '<p style="font-size:12px; color:#94a3b8; margin:8px 0 0 0;">Sin ejercicios asignados.</p>';
+        };
+        window.removeClassExercise = (idx) => { selected.splice(idx, 1); render(); };
+        document.getElementById('btn-add-class-exercise').onclick = async () => {
+            const name = input.value.trim();
+            if (!name) return;
+            const exercise = await ensureExerciseInBank(name, 'admin');
+            if (exercise && !selected.some(item => normalizeExerciseName(item.nombre) === normalizeExerciseName(exercise.nombre))) {
+                selected.push({ nombre: exercise.nombre });
+            }
+            input.value = '';
+            render();
+        };
+        render();
+    };
+    const getSelectedClassExercises = () => {
+        const root = document.querySelector('.exercise-builder');
+        if (!root) return [];
+        try { return JSON.parse(root.dataset.selected || '[]'); } catch (_) { return []; }
+    };
+
     document.getElementById('btn-add-clase').addEventListener('click', () => {
         if(db.profesores.length === 0) {
             alert("Debes crear al menos un Profesor en el módulo de Personal antes de planificar clases.");
@@ -1572,13 +1633,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let profOptions = db.profesores.map(p => `<option value="${p.nombre}">${p.nombre}</option>`).join('');
         
-        let ejOptions = db.ejercicios.map(e => `
-            <label style="display:flex; align-items:center; gap:8px; font-size:13px; padding:5px 0; cursor:pointer;">
-                <input type="checkbox" name="clase-ejs" value="${e.nombre}"> <span>${e.nombre}</span> <span style="font-size:10px; color:#aaa;">(${e.musculo || 'Gral'})</span>
-            </label>
-        `).join('');
-        if(!ejOptions) ejOptions = '<p style="font-size:12px; color:#999;">No hay ejercicios creados.</p>';
-
         openModal('Planificar Clase', `
             <form id="form-clase">
                 <div class="input-group">
@@ -1603,9 +1657,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 <div style="background:var(--bg-color); padding:15px; border-radius:12px; border:1px solid rgba(0,0,0,0.05); margin-bottom:15px;">
                     <h5 style="font-size:13px; margin-bottom:10px; color:var(--text-main);">Ejercicios Asignados (Opcional)</h5>
-                    <div style="max-height:110px; overflow-y:auto; padding-right:5px;">
-                        ${ejOptions}
-                    </div>
+                    ${exerciseBuilderHtml()}
                 </div>
 
                 <button type="submit" class="btn-primary btn-sm" style="width:100%;">Crear Clase</button>
@@ -1617,10 +1669,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const mm = String(today.getMonth() + 1).padStart(2, '0');
         const dd = String(today.getDate()).padStart(2, '0');
         document.getElementById('cl-fecha').value = `${yyyy}-${mm}-${dd}`;
+        setupExerciseBuilder();
 
-        document.getElementById('form-clase').onsubmit = (e) => {
+        document.getElementById('form-clase').onsubmit = async (e) => {
             e.preventDefault();
-            const ejs = Array.from(document.querySelectorAll('input[name="clase-ejs"]:checked')).map(cb => { return { nombre: cb.value }; });
+            const ejs = getSelectedClassExercises();
 
             dbRef.collection("clases").add({
                 nombre: document.getElementById('cl-nombre').value,
@@ -1649,14 +1702,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const clase = db.clases[idx];
         let profOptions = db.profesores.map(p => `<option value="${p.nombre}" ${p.nombre===clase.profesor?'selected':''}>${p.nombre}</option>`).join('');
         
-        let ejOptions = db.ejercicios.map(e => {
-            const isChecked = clase.ejercicios && clase.ejercicios.some(ce => ce.nombre === e.nombre) ? 'checked' : '';
-            return `
-            <label style="display:flex; align-items:center; gap:8px; font-size:13px; padding:5px 0; cursor:pointer;">
-                <input type="checkbox" name="clase-ejs" value="${e.nombre}" ${isChecked}> <span>${e.nombre}</span> <span style="font-size:10px; color:#aaa;">(${e.musculo || 'Gral'})</span>
-            </label>`;
-        }).join('');
-
         openModal('Modificar Clase', `
             <form id="form-clase-edit">
                 <div class="input-group">
@@ -1681,18 +1726,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 <div style="background:var(--bg-color); padding:15px; border-radius:12px; border:1px solid rgba(0,0,0,0.05); margin-bottom:15px;">
                     <h5 style="font-size:13px; margin-bottom:10px; color:var(--text-main);">Ejercicios Asignados</h5>
-                    <div style="max-height:110px; overflow-y:auto; padding-right:5px;">
-                        ${ejOptions}
-                    </div>
+                    ${exerciseBuilderHtml(clase.ejercicios || [])}
                 </div>
 
                 <button type="submit" class="btn-primary btn-sm" style="width:100%;">Guardar Cambios</button>
             </form>
         `);
 
-        document.getElementById('form-clase-edit').onsubmit = (e) => {
+        setupExerciseBuilder();
+
+        document.getElementById('form-clase-edit').onsubmit = async (e) => {
             e.preventDefault();
-            const ejs = Array.from(document.querySelectorAll('input[name="clase-ejs"]:checked')).map(cb => { return { nombre: cb.value }; });
+            const ejs = getSelectedClassExercises();
 
             dbRef.collection("clases").doc(clase.id).set({
                 nombre: document.getElementById('cl-nombre').value,
@@ -1963,13 +2008,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.getElementById('ejercicios-list');
         container.innerHTML = '';
         if(db.ejercicios.length === 0) {
-            container.innerHTML = '<p style="color:var(--text-muted); font-size:14px; width:100%;">Aún no has creado ejercicios.</p>';
+            container.innerHTML = '<p style="color:var(--text-muted); font-size:14px; width:100%;">Aun no has creado ejercicios.</p>';
             return;
         }
         db.ejercicios.forEach((ej, idx) => {
             container.innerHTML += `
                 <div class="data-card">
-                    <span class="badge">${ej.musculo || 'General / Fullbody'}</span>
+                    <span class="badge">Banco de ejercicios</span>
                     <h4>${ej.nombre}</h4>
                     <div class="card-actions">
                         <button class="btn-icon" onclick="editEjercicio(${idx})" title="Modificar"><i class="fa-solid fa-pen"></i></button>
@@ -1984,35 +2029,18 @@ document.addEventListener('DOMContentLoaded', () => {
         openModal('Nuevo Ejercicio', `
             <form id="form-ej">
                 <div class="input-group"><i class="fa-solid fa-person-running"></i><input type="text" id="ej-nombre" placeholder="Nombre del Ejercicio" required></div>
-                <div class="input-group">
-                    <i class="fa-solid fa-child-reaching"></i>
-                    <select id="ej-musculo">
-                        <option value="">Selecciona zona muscular (opcional)</option>
-                        <option value="Pecho">Pecho</option>
-                        <option value="Espalda">Espalda</option>
-                        <option value="Piernas">Piernas</option>
-                        <option value="Brazos">Brazos</option>
-                        <option value="Hombros">Hombros</option>
-                        <option value="Core/Abdomen">Core/Abdomen</option>
-                        <option value="Glúteos">Glúteos</option>
-                        <option value="Cardio">Cardio / General</option>
-                    </select>
-                </div>
                 <button type="submit" class="btn-primary btn-sm" style="width:100%; margin-top:10px;">Guardar Ejercicio</button>
             </form>
         `);
         document.getElementById('form-ej').onsubmit = (e) => {
             e.preventDefault();
-            dbRef.collection("ejercicios").add({
-                nombre: document.getElementById('ej-nombre').value,
-                musculo: document.getElementById('ej-musculo').value
-            }).then(() => {
+            ensureExerciseInBank(document.getElementById('ej-nombre').value, 'admin').then(() => {
                 modal.classList.add('hidden');
             }).catch(err => alert("Error al guardar ejercicio: " + err));
         };
     });
     window.deleteEjercicio = (idx) => {
-        if(confirm('¿Eliminar ejercicio?')) {
+        if(confirm('Eliminar ejercicio?')) {
             const ej = db.ejercicios[idx];
             if (ej && ej.id) {
                 dbRef.collection("ejercicios").doc(ej.id).delete()
@@ -2025,34 +2053,19 @@ document.addEventListener('DOMContentLoaded', () => {
         openModal('Modificar Ejercicio', `
             <form id="form-ej-edit">
                 <div class="input-group"><i class="fa-solid fa-person-running"></i><input type="text" id="ej-nombre" value="${ej.nombre}" required></div>
-                <div class="input-group">
-                    <i class="fa-solid fa-child-reaching"></i>
-                    <select id="ej-musculo">
-                        <option value="">Selecciona zona muscular (opcional)</option>
-                        <option value="Pecho" ${ej.musculo==='Pecho'?'selected':''}>Pecho</option>
-                        <option value="Espalda" ${ej.musculo==='Espalda'?'selected':''}>Espalda</option>
-                        <option value="Piernas" ${ej.musculo==='Piernas'?'selected':''}>Piernas</option>
-                        <option value="Brazos" ${ej.musculo==='Brazos'?'selected':''}>Brazos</option>
-                        <option value="Hombros" ${ej.musculo==='Hombros'?'selected':''}>Hombros</option>
-                        <option value="Core/Abdomen" ${ej.musculo==='Core/Abdomen'?'selected':''}>Core/Abdomen</option>
-                        <option value="Glúteos" ${ej.musculo==='Glúteos'?'selected':''}>Glúteos</option>
-                        <option value="Cardio" ${ej.musculo==='Cardio'?'selected':''}>Cardio / General</option>
-                    </select>
-                </div>
                 <button type="submit" class="btn-primary btn-sm" style="width:100%; margin-top:10px;">Guardar Cambios</button>
             </form>
         `);
         document.getElementById('form-ej-edit').onsubmit = (e) => {
             e.preventDefault();
             dbRef.collection("ejercicios").doc(ej.id).set({
-                nombre: document.getElementById('ej-nombre').value,
-                musculo: document.getElementById('ej-musculo').value
-            }).then(() => {
+                nombre: document.getElementById('ej-nombre').value.trim(),
+                actualizadoEn: new Date().toISOString()
+            }, { merge: true }).then(() => {
                 modal.classList.add('hidden');
             }).catch(err => alert("Error al guardar cambios: " + err));
         };
     };
-
     const normalizarInvitaciones = () => {
         const invitaciones = Array.isArray(db.configuracion.invitaciones) ? db.configuracion.invitaciones : [];
         return invitaciones

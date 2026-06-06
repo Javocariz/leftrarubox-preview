@@ -56,6 +56,20 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const todayStr = getLocalDateStr();
+    const normalizeExerciseName = (name) => String(name || '').trim().toLowerCase().replace(/\s+/g, ' ');
+    const findExerciseByName = (name) => db.ejercicios.find(e => normalizeExerciseName(e.nombre) === normalizeExerciseName(name));
+    const ensureTeacherExerciseInBank = async (name) => {
+        const cleanName = String(name || '').trim().replace(/\s+/g, ' ');
+        if (!cleanName) return null;
+        const existing = findExerciseByName(cleanName);
+        if (existing) return existing;
+        const doc = await dbRef.collection("ejercicios").add({
+            nombre: cleanName,
+            creadoPor: 'profesor',
+            creadoEn: new Date().toISOString()
+        });
+        return { id: doc.id, nombre: cleanName, creadoPor: 'profesor' };
+    };
 
     const fillCreateClassDefaults = () => {
         const dateInput = document.getElementById('teacher-class-date');
@@ -78,17 +92,47 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderTeacherExerciseOptions = () => {
         const container = document.getElementById('teacher-exercises-list');
         if (!container) return;
-        if (!db.ejercicios.length) {
-            container.innerHTML = '<p>No hay ejercicios creados.</p>';
-            return;
-        }
-        container.innerHTML = db.ejercicios.map(e => `
-            <label>
-                <input type="checkbox" name="teacher-class-exercises" value="${e.nombre}">
-                <span>${e.nombre}</span>
-                <small>(${e.musculo || 'General'})</small>
-            </label>
-        `).join('');
+        container.innerHTML = `
+            <div class="teacher-exercise-adder">
+                <input type="text" id="teacher-exercise-input" list="teacher-exercise-suggestions" placeholder="Escribe un ejercicio (ej. Push Ups)">
+                <datalist id="teacher-exercise-suggestions">
+                    ${db.ejercicios.map(e => `<option value="${e.nombre}"></option>`).join('')}
+                </datalist>
+                <button type="button" id="btn-add-teacher-exercise">Agregar</button>
+            </div>
+            <div id="teacher-selected-exercises" class="teacher-selected-exercises"></div>
+        `;
+        setupTeacherExerciseBuilder();
+    };
+
+    const setupTeacherExerciseBuilder = () => {
+        const input = document.getElementById('teacher-exercise-input');
+        const button = document.getElementById('btn-add-teacher-exercise');
+        const selectedBox = document.getElementById('teacher-selected-exercises');
+        if (!input || !button || !selectedBox) return;
+        let selected = [];
+        const render = () => {
+            selectedBox.dataset.selected = JSON.stringify(selected);
+            selectedBox.innerHTML = selected.length
+                ? selected.map((item, idx) => `<span class="teacher-exercise-chip">${item.nombre}<button type="button" onclick="removeTeacherExercise(${idx})"><i class="fa-solid fa-xmark"></i></button></span>`).join('')
+                : '<p>Sin ejercicios asignados.</p>';
+        };
+        window.removeTeacherExercise = (idx) => { selected.splice(idx, 1); render(); };
+        button.onclick = async () => {
+            const exercise = await ensureTeacherExerciseInBank(input.value);
+            if (exercise && !selected.some(item => normalizeExerciseName(item.nombre) === normalizeExerciseName(exercise.nombre))) {
+                selected.push({ nombre: exercise.nombre });
+            }
+            input.value = '';
+            render();
+        };
+        render();
+    };
+
+    const getTeacherSelectedExercises = () => {
+        const selectedBox = document.getElementById('teacher-selected-exercises');
+        if (!selectedBox) return [];
+        try { return JSON.parse(selectedBox.dataset.selected || '[]'); } catch (_) { return []; }
     };
 
     // Configurar Escuchadores en Tiempo Real de Firebase
@@ -162,8 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const date = document.getElementById('teacher-class-date').value;
             const hour = document.getElementById('teacher-class-hour').value;
             const minute = document.getElementById('teacher-class-minute').value;
-            const exercises = Array.from(document.querySelectorAll('input[name="teacher-class-exercises"]:checked'))
-                .map(item => ({ nombre: item.value }));
+            const exercises = getTeacherSelectedExercises();
             if (!name || !date || !hour || !minute) {
                 alert('Completa nombre, fecha y hora.');
                 return;
