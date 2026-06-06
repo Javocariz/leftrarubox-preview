@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css?v=1.0.1">
-    <link rel="stylesheet" href="css/student.css?v=1.0.1">
+    <link rel="stylesheet" href="css/student.css?v=1.0.2">
     <style>
         /* === CORRECCIÓN CRÍTICA DE VISTA DE CLASES DISPONIBLES (INLINE CONTRA CACHÉ LOCAL) === */
         @media (min-width: 768px) {
@@ -48,6 +48,29 @@
                 max-width: 320px !important;
                 min-width: 260px !important;
                 scroll-snap-align: none !important;
+            }
+        }
+        @media (min-width: 768px) {
+            #modal-reservar .modal-content.glassmorphism {
+                width: calc(100vw - 48px) !important;
+                height: 85vh !important;
+                max-height: 85vh !important;
+                overflow: hidden !important;
+                display: flex !important;
+                flex-direction: column !important;
+            }
+
+            #modal-reservar .modal-header,
+            #modal-reservar .modal-content.glassmorphism > p {
+                flex: 0 0 auto !important;
+            }
+
+            #clases-disponibles-list {
+                overflow-x: hidden !important;
+                overflow-y: auto !important;
+                flex: 1 1 auto !important;
+                min-height: 0 !important;
+                padding-right: 8px !important;
             }
         }
     </style>
@@ -217,6 +240,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="js/firebase-config.js?v=1.0.1"></script>
-    <script src="js/student.js?v=1.0.5"></script>
+    <script src="js/student.js?v=1.0.6"></script>
 </body>
 </html>

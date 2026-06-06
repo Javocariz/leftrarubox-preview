@@ -540,3 +540,29 @@
     }
 }
 
+/* Ajuste final: el selector de clases del alumno debe desplazarse dentro del modal. */
+@media (min-width: 768px) {
+    #modal-reservar .modal-content.glassmorphism {
+        max-width: 900px !important;
+        width: calc(100vw - 48px) !important;
+        height: 85vh !important;
+        max-height: 85vh !important;
+        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    #modal-reservar .modal-header,
+    #modal-reservar .modal-content.glassmorphism > p {
+        flex: 0 0 auto !important;
+    }
+
+    #clases-disponibles-list {
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        padding-right: 8px !important;
+    }
+}
+

@@ -536,18 +536,13 @@ document.addEventListener('DOMContentLoaded', () => {
         dispContainer.innerHTML = '';
         const now = new Date();
 
-        // Obtener fecha de hoy en formato local YYYY-MM-DD para el filtro
-        const today = new Date();
-        const yyyy = today.getFullYear();
-        const mm = String(today.getMonth() + 1).padStart(2, '0');
-        const dd = String(today.getDate()).padStart(2, '0');
-        const todayStr = `${yyyy}-${mm}-${dd}`;
-
-        // Filtro DEFENSIVO: verificar tipo de campo 'fecha' antes de comparar
-        // (evita que documentos con campo fecha=undefined sean excluidos silenciosamente)
+        // Mostrar solo clases que aun no han comenzado. Si ya paso la hora, deja de ser reservable.
         let futuras = db.clases.filter(c => {
             if (!c || typeof c.fecha !== 'string' || c.fecha.trim() === '') return false;
-            return c.fecha >= todayStr;
+            const [cYear, cMonth, cDay] = c.fecha.split('-');
+            const [cHour, cMin] = (c.hora || "00:00").split(':');
+            const classDateTime = new Date(cYear, cMonth - 1, cDay, cHour, cMin);
+            return classDateTime >= now;
         });
 
         // Ordenar cronológicamente con ID como desempate para garantizar orden determinista
@@ -605,17 +600,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                         const yaInscrito = clase.alumnosInscritos.includes(currentUserEmail);
 
-                        // Validar si la clase ya pasó (hoy pero hora anterior)
-                        const [cYear, cMonth, cDay] = clase.fecha.split('-');
-                        const [cHour, cMin] = (clase.hora || "00:00").split(':');
-                        const classDateTime = new Date(cYear, cMonth - 1, cDay, cHour, cMin);
-                        const isPastClass = classDateTime < new Date();
-
                         let btnHtml = '';
                         if (yaInscrito) {
                             btnHtml = `<button class="btn-primary btn-sm" disabled style="background:#e2e8f0; color:#64748b; width:100%;">Inscrito</button>`;
-                        } else if (isPastClass) {
-                            btnHtml = `<button class="btn-primary btn-sm" disabled style="background:#e2e8f0; color:#64748b; width:100%;">Clase Finalizada</button>`;
                         } else {
                             btnHtml = `<button class="btn-primary btn-sm" onclick="bookClass(${originalIdx})" style="width:100%; background:#0f172a;">Reservar Clase</button>`;
                         }
