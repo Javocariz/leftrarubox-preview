@@ -111,7 +111,7 @@
         <div class="modal-content glassmorphism">
             <div class="modal-header">
                 <div>
-                    <h2>Crear Clase</h2>
+                    <h2>Planificar Clase</h2>
                     <p style="color:var(--text-muted); font-size:12px; margin-top:2px; font-weight:600;">La clase quedara asignada automaticamente a tu usuario profesor.</p>
                 </div>
                 <button class="btn-close-modal" id="btn-close-create-class" title="Cerrar"><i class="fa-solid fa-xmark"></i></button>
@@ -121,20 +121,32 @@
                     <i class="fa-solid fa-dumbbell"></i>
                     <input type="text" id="teacher-class-name" placeholder="Nombre de la clase" required>
                 </div>
-                <div class="teacher-class-field">
-                    <i class="fa-solid fa-calendar-day"></i>
-                    <input type="date" id="teacher-class-date" required>
+                <div class="teacher-class-row">
+                    <div class="teacher-class-field">
+                        <i class="fa-solid fa-calendar-day"></i>
+                        <input type="date" id="teacher-class-date" required>
+                    </div>
+                    <div class="teacher-time-pill" aria-label="Hora de la clase">
+                        <i class="fa-regular fa-clock"></i>
+                        <select id="teacher-class-hour" required></select>
+                        <span>:</span>
+                        <select id="teacher-class-minute" required>
+                            <option value="00">00</option>
+                            <option value="15">15</option>
+                            <option value="30">30</option>
+                            <option value="45">45</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="teacher-time-pill" aria-label="Hora de la clase">
-                    <i class="fa-regular fa-clock"></i>
-                    <select id="teacher-class-hour" required></select>
-                    <span>:</span>
-                    <select id="teacher-class-minute" required>
-                        <option value="00">00</option>
-                        <option value="15">15</option>
-                        <option value="30">30</option>
-                        <option value="45">45</option>
-                    </select>
+                <div class="teacher-class-field is-readonly">
+                    <i class="fa-solid fa-user-tie"></i>
+                    <input type="text" id="teacher-class-professor" readonly>
+                </div>
+                <div class="teacher-exercises-box">
+                    <h5>Ejercicios Asignados (Opcional)</h5>
+                    <div id="teacher-exercises-list" class="teacher-exercises-list">
+                        <p>No hay ejercicios creados.</p>
+                    </div>
                 </div>
                 <button type="submit" class="teacher-submit-class">
                     <i class="fa-solid fa-calendar-plus"></i> Crear Clase
@@ -147,6 +159,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="js/firebase-config.js?v=1.0.1"></script>
-    <script src="js/trainer.js?v=1.0.3"></script>
+    <script src="js/trainer.js?v=1.0.4"></script>
 </body>
 </html>

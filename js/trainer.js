@@ -12,7 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. Base de Datos Reactiva en tiempo real
     let db = {
         clases: [],
-        alumnos: []
+        alumnos: [],
+        ejercicios: []
     };
 
     let currentTab = 'hoy'; // 'hoy' o 'historial'
@@ -60,7 +61,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const dateInput = document.getElementById('teacher-class-date');
         const hourSelect = document.getElementById('teacher-class-hour');
         const minuteSelect = document.getElementById('teacher-class-minute');
+        const professorInput = document.getElementById('teacher-class-professor');
         if (dateInput) dateInput.value = getLocalDateStr();
+        if (professorInput) professorInput.value = currentProfessorName || 'Profesor';
         if (hourSelect && !hourSelect.options.length) {
             for (let hour = 5; hour <= 23; hour++) {
                 const value = String(hour).padStart(2, '0');
@@ -69,6 +72,23 @@ document.addEventListener('DOMContentLoaded', () => {
             hourSelect.value = '08';
         }
         if (minuteSelect) minuteSelect.value = '00';
+        renderTeacherExerciseOptions();
+    };
+
+    const renderTeacherExerciseOptions = () => {
+        const container = document.getElementById('teacher-exercises-list');
+        if (!container) return;
+        if (!db.ejercicios.length) {
+            container.innerHTML = '<p>No hay ejercicios creados.</p>';
+            return;
+        }
+        container.innerHTML = db.ejercicios.map(e => `
+            <label>
+                <input type="checkbox" name="teacher-class-exercises" value="${e.nombre}">
+                <span>${e.nombre}</span>
+                <small>(${e.musculo || 'General'})</small>
+            </label>
+        `).join('');
     };
 
     // Configurar Escuchadores en Tiempo Real de Firebase
@@ -114,6 +134,13 @@ document.addEventListener('DOMContentLoaded', () => {
         btnCreateClass.addEventListener('click', () => {
             window.openTeacherCreateClass();
         });
+
+        dbRef.collection("ejercicios").onSnapshot(snap => {
+            db.ejercicios = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            if (modalCreateClass && !modalCreateClass.classList.contains('hidden')) {
+                renderTeacherExerciseOptions();
+            }
+        });
     }
 
     window.openTeacherCreateClass = () => {
@@ -135,6 +162,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const date = document.getElementById('teacher-class-date').value;
             const hour = document.getElementById('teacher-class-hour').value;
             const minute = document.getElementById('teacher-class-minute').value;
+            const exercises = Array.from(document.querySelectorAll('input[name="teacher-class-exercises"]:checked'))
+                .map(item => ({ nombre: item.value }));
             if (!name || !date || !hour || !minute) {
                 alert('Completa nombre, fecha y hora.');
                 return;
@@ -145,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 fecha: date,
                 hora: `${hour}:${minute}`,
                 profesor: currentProfessorName || 'Profesor',
-                ejercicios: [],
+                ejercicios: exercises,
                 alumnosInscritos: [],
                 alumnosAsistieron: [],
                 asistenciaGrabada: false,
